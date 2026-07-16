@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AICOR · The Lab Robot (Tracy)</title>
+<link rel="stylesheet" href="/static/app.css" />
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <a class="back" href="/" title="AICOR dashboard">←</a>
+    <div class="logo">◧◧</div>
+    <div class="brand-text">
+      <h1>AICOR System · The Lab Robot</h1>
+      <p>Tracy — dual-arm sterility testing, reasoning about its own world</p>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <a class="ext" href="https://vib.ai.uni-bremen.de/page/comingsoon/the-tracebot-laboratory/" target="_blank" rel="noopener">TraceBot @ IAI Bremen ↗</a>
+  </div>
+</header>
+
+<main class="split">
+  <!-- ============================ LEFT : ROBOT ============================ -->
+  <section class="panel panel-left">
+    <div class="panel-head">
+      <h2>Tracy · the lab robot</h2>
+      <div class="view-toggle">
+        <button data-view="3d" class="active">3D model</button>
+        <button data-view="photo">Real robot</button>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div id="stage-bg" class="stage-bg"></div>
+      <div id="viewer"></div>
+      <img id="photo" class="hidden" src="/static/img/tracy_robot_with_objects.jpg" alt="Tracy robot" />
+      <div id="viewer-status" class="viewer-status">Loading Tracy…</div>
+
+      <div id="layers-panel" class="layers-panel">
+        <div class="lp-title">Layers</div>
+        <label class="lp-row"><input type="checkbox" id="lyr-objects" checked><span>Bench objects</span></label>
+        <label class="lp-row"><input type="checkbox" id="lyr-labels"><span>Object labels</span></label>
+        <label class="lp-row"><input type="checkbox" id="lyr-floor" checked><span>Floor shadow</span></label>
+        <label class="lp-row"><input type="checkbox" id="lyr-rotate"><span>Auto-rotate</span></label>
+        <div class="lp-legend" id="lp-legend"></div>
+      </div>
+
+      <div id="step-caption" class="step-caption hidden"></div>
+      <div class="stage-hint">drag orbit · scroll zoom · right-drag pan</div>
+    </div>
+
+    <div class="workflow">
+      <div class="workflow-head">
+        <span>Membrane-based sterility test · <em>real CRAM/giskardpy motion</em></span>
+        <button id="play-btn" class="play-btn cram" title="Play the whole membrane-based sterility test as a trajectory planned by pycram + giskardpy">▶ Run the real test</button>
+      </div>
+      <div id="workflow-strip" class="workflow-strip"><!-- filled by JS --></div>
+    </div>
+  </section>
+
+  <!-- ========================= RIGHT : KNOWLEDGE ========================= -->
+  <section class="panel panel-right">
+    <div class="panel-head">
+      <h2>Knowledge graph &amp; reasoning</h2>
+      <span id="kb-status" class="kb-status">booting Prolog…</span>
+    </div>
+
+    <div class="query-box">
+      <div class="query-row">
+        <input id="query-input" type="text" spellcheck="false"
+               placeholder="Ask the world:  relevant_regulation(spike_media, R)." />
+        <button id="query-run">Run</button>
+      </div>
+      <div id="presets" class="presets"><!-- filled by JS --></div>
+    </div>
+
+    <div id="answer" class="answer">
+      <div class="answer-empty">Pick a question below, click a workflow step, or type a Prolog goal. Clicking a node in the graph highlights the related parts on the left.</div>
+    </div>
+
+    <div class="graph-wrap">
+      <div id="graph"></div>
+      <div class="legend" id="legend"></div>
+    </div>
+  </section>
+</main>
+
+<!-- vendored libraries (all local, no CDN at runtime) -->
+<script src="/vendor/three.min.js"></script>
+<script src="/vendor/RoomEnvironment.js"></script>
+<script src="/vendor/STLLoader.js"></script>
+<script src="/vendor/ColladaLoader.js"></script>
+<script src="/vendor/OrbitControls.js"></script>
+<script src="/vendor/URDFLoader.js"></script>
+<script src="/vendor/vis-network.min.js"></script>
+<script src="/vendor/tau-prolog.js"></script>
+<script src="/vendor/tau-lists.js"></script>
+<!-- app -->
+<script src="/static/kb.js"></script>
+<script src="/static/designators.js"></script>
+<script src="/static/robot.js"></script>
+<script src="/static/graph.js"></script>
+<script src="/static/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AICOR System</title>
+<link rel="stylesheet" href="/static/app.css" />
+</head>
+<body class="dash">
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">◧◧</div>
+    <div class="brand-text">
+      <h1>AICOR System</h1>
+      <p>Cognition-enabled robots that reason about their own laboratory world</p>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <a class="ext" href="https://vib.ai.uni-bremen.de/page/comingsoon/the-tracebot-laboratory/" target="_blank" rel="noopener">IAI Bremen ↗</a>
+  </div>
+</header>
+
+<main class="dashboard">
+  <div class="dash-intro">
+    <h2>Choose a scenario</h2>
+    <p>Both scenarios pair a live robot view with an interactive knowledge graph you can
+       query in Prolog — including which safety regulations and policies apply to a task.</p>
+  </div>
+
+  <div class="cards">
+    <a class="card" href="/lab-robot.html">
+      <div class="card-badge" style="--c:#39d5c8">STATIONARY</div>
+      <div class="card-art art-tracy">
+        <span class="art-emoji">🦾</span>
+      </div>
+      <h3>The Lab Robot</h3>
+      <p>Tracy, the dual-arm workcell, performs a membrane-based <b>sterility test</b> —
+         reason about its workflow steps, the objects on the bench, the CRAM action
+         designators, and the safety regulators for each task.</p>
+      <ul class="card-facts">
+        <li>2× UR10e + Robotiq grippers</li>
+        <li>10-step sterility-testing workflow</li>
+        <li>GMP · Ph. Eur. · ISO safety reasoning</li>
+      </ul>
+      <div class="card-go">Open scenario →</div>
+    </a>
+
+    <a class="card" href="/full-lab.html">
+      <div class="card-badge" style="--c:#5b8cff">MOBILE</div>
+      <div class="card-art art-lab">
+        <span class="art-emoji">🤖</span>
+      </div>
+      <h3>The Full Lab</h3>
+      <p>A mobile robot (HSR) <b>navigates the laboratory</b>, transporting samples,
+         reagents and cultures from station to station for the tests a lab runs day to
+         day — with the navigation policies and safety rules that govern a shared space.</p>
+      <ul class="card-facts">
+        <li>Toyota HSR mobile manipulator</li>
+        <li>Fetch-&amp;-deliver transport tasks (A → B)</li>
+        <li>ISO 13482 / 3691-4 · contamination policies</li>
+      </ul>
+      <div class="card-go">Open scenario →</div>
+    </a>
+
+    <a class="card" href="/wind-turbine.html">
+      <div class="card-badge" style="--c:#b98cff">ASSEMBLY</div>
+      <div class="card-art art-turbine">
+        <span class="art-emoji">🌀</span>
+      </div>
+      <h3>Wind-turbine Assembly</h3>
+      <p>Tracy <b>assembles a wind turbine</b> from parts on the bench — foundation,
+         tower, nacelle, hub and rotor blades — playing back a real motion trajectory
+         planned by the CRAM cognitive architecture (pycram + giskardpy).</p>
+      <ul class="card-facts">
+        <li>Real recorded pick-&amp;-stack trajectory</li>
+        <li>Foundation → tower → nacelle → hub → blades</li>
+        <li>Collision-aware assembly motion</li>
+      </ul>
+      <div class="card-go">Open scenario →</div>
+    </a>
+  </div>
+
+  <p class="dash-foot">Runs entirely locally · 3D from real robot URDFs · reasoning in Prolog (tau-prolog)</p>
+</main>
+</body>
+</html>

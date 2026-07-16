@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AICOR · The Full Lab (HSR)</title>
+<link rel="stylesheet" href="/static/app.css" />
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <a class="back" href="/" title="AICOR dashboard">←</a>
+    <div class="logo">◧◧</div>
+    <div class="brand-text">
+      <h1>AICOR System · The Full Lab</h1>
+      <p>A mobile robot moving samples through the laboratory, reasoning about navigation &amp; safety policies</p>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <a class="ext" href="https://vib.ai.uni-bremen.de/page/comingsoon/the-tracebot-laboratory/" target="_blank" rel="noopener">IAI Bremen ↗</a>
+  </div>
+</header>
+
+<main class="split">
+  <section class="panel panel-left">
+    <div class="panel-head">
+      <h2>HSR · mobile lab transport</h2>
+      <span class="kb-status">Toyota HSR</span>
+    </div>
+
+    <div class="stage">
+      <div id="viewer"></div>
+      <div id="viewer-status" class="viewer-status">Loading the lab…</div>
+      <div id="step-caption" class="step-caption hidden"></div>
+      <div class="stage-hint">drag to orbit · scroll to zoom</div>
+    </div>
+
+    <div class="workflow">
+      <div class="workflow-head">
+        <span>Laboratory transport tasks</span>
+        <button id="play-btn" class="play-btn">▶ Run the lab</button>
+      </div>
+      <div id="workflow-strip" class="workflow-strip"><!-- filled by JS --></div>
+    </div>
+  </section>
+
+  <section class="panel panel-right">
+    <div class="panel-head">
+      <h2>Knowledge graph &amp; reasoning</h2>
+      <span id="kb-status" class="kb-status">booting Prolog…</span>
+    </div>
+
+    <div class="query-box">
+      <div class="query-row">
+        <input id="query-input" type="text" spellcheck="false"
+               placeholder="Ask the lab:  relevant_policy(remove_waste, P)." />
+        <button id="query-run">Run</button>
+      </div>
+      <div id="presets" class="presets"><!-- filled by JS --></div>
+    </div>
+
+    <div id="answer" class="answer">
+      <div class="answer-empty">Pick a transport task or a question. Clicking a node in the graph highlights the related stations, objects and tasks on the left.</div>
+    </div>
+
+    <div class="graph-wrap">
+      <div id="graph"></div>
+      <div class="legend" id="legend"></div>
+    </div>
+  </section>
+</main>
+
+<script src="/vendor/three.min.js"></script>
+<script src="/vendor/STLLoader.js"></script>
+<script src="/vendor/ColladaLoader.js"></script>
+<script src="/vendor/OrbitControls.js"></script>
+<script src="/vendor/URDFLoader.js"></script>
+<script src="/vendor/vis-network.min.js"></script>
+<script src="/vendor/tau-prolog.js"></script>
+<script src="/vendor/tau-lists.js"></script>
+<script src="/static/kb_fulllab.js"></script>
+<script src="/static/designators.js"></script>
+<script src="/static/fulllab.js"></script>
+<script src="/static/graph.js"></script>
+<script src="/static/main_fulllab.js"></script>
+</body>
+</html>

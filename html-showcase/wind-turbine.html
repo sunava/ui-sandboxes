@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AICOR · Wind-turbine assembly</title>
+<link rel="stylesheet" href="/static/app.css" />
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <a class="back" href="/" title="AICOR dashboard">←</a>
+    <div class="logo">◧◧</div>
+    <div class="brand-text">
+      <h1>AICOR System · Wind-turbine assembly</h1>
+      <p>Tracy assembles a wind turbine — real pycram + giskardpy motion</p>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <a class="ext" href="https://vib.ai.uni-bremen.de/page/comingsoon/the-tracebot-laboratory/" target="_blank" rel="noopener">IAI Bremen ↗</a>
+  </div>
+</header>
+
+<main class="split">
+  <section class="panel panel-left">
+    <div class="panel-head">
+      <h2>Tracy · assembly cell</h2>
+      <span class="kb-status">recorded CRAM trajectory</span>
+    </div>
+    <div class="stage">
+      <div id="viewer"></div>
+      <div id="viewer-status" class="viewer-status">Loading the assembly cell…</div>
+      <div id="step-caption" class="step-caption hidden"></div>
+      <div class="stage-hint">drag to orbit · scroll to zoom</div>
+    </div>
+    <div class="workflow">
+      <div class="workflow-head">
+        <span>Assembly sequence</span>
+        <button id="play-btn" class="play-btn cram">▶ Assemble the turbine</button>
+      </div>
+      <div id="workflow-strip" class="workflow-strip"><!-- filled by JS --></div>
+    </div>
+  </section>
+
+  <section class="panel panel-right">
+    <div class="panel-head">
+      <h2>Task &amp; parts</h2>
+      <span class="kb-status ready">pycram · giskardpy</span>
+    </div>
+    <div id="answer" class="answer" style="max-height:none;flex:1">
+      <div class="answer-empty">Loading task…</div>
+    </div>
+  </section>
+</main>
+
+<script src="/vendor/three.min.js"></script>
+<script src="/vendor/STLLoader.js"></script>
+<script src="/vendor/ColladaLoader.js"></script>
+<script src="/vendor/OrbitControls.js"></script>
+<script src="/vendor/URDFLoader.js"></script>
+<script src="/static/turbine.js"></script>
+<script src="/static/main_turbine.js"></script>
+</body>
+</html>
