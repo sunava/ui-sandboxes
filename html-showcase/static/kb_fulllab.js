@@ -150,6 +150,20 @@ const OBJECT_COLORS = {
 };
 if (typeof window !== 'undefined') { window.STATIONS = STATIONS; window.OBJECT_COLORS = OBJECT_COLORS; }
 
+/* Pharma-lab tycoon: an event that can pop up at each station. `task` links to
+ * the KB task whose safety policies/actions are shown when the robot handles it;
+ * `fail` is the consequence if the operator ignores it too long. */
+const STATION_EVENTS = {
+  storage:        { icon: '🧴', obj: 'reagent_kit',   title: 'Reagent restock needed',   task: 'fetch_samples',      fail: 'Reagent ran out — batch delayed' },
+  sample_prep:    { icon: '🧪', obj: 'sample_rack',   title: 'New samples to prepare',   task: 'prep_to_centrifuge', fail: 'Samples degraded on the bench' },
+  centrifuge:     { icon: '⚗️', obj: 'specimen',      title: 'Spin-down complete',       task: 'deliver_analysis',   fail: 'Pellet resuspended — re-run needed' },
+  incubator:      { icon: '🧫', obj: 'culture_plate', title: 'Cultures ready to move',   task: 'incubate_cultures',  fail: 'Over-incubation — cultures spoiled' },
+  analyzer:       { icon: '📊', obj: 'specimen',      title: 'Result ready to log',      task: 'deliver_analysis',   fail: 'Result lost — data-integrity flag' },
+  disposal:       { icon: '☣️', obj: 'waste_bag',     title: 'Biohazard waste is full',  task: 'remove_waste',       fail: 'Biohazard spill!' },
+  sterility_cell: { icon: '🧼', obj: 'tsb_supply',    title: 'Resupply the sterility cell', task: 'supply_sterility', fail: 'Sterility breach in the cell' },
+};
+if (typeof window !== 'undefined') window.STATION_EVENTS = STATION_EVENTS;
+
 /* CRAM designator templates for the mobile actions */
 const ACTION_DESIGNATORS = {
   park_arms:  ['parking-arms', [['arms', '(:left)']]],

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>AICOR · The Full Lab (HSR)</title>
+<title>AICOR · Pharma-Lab Automation</title>
 <link rel="stylesheet" href="static/app.css" />
 </head>
 <body>
@@ -12,8 +12,8 @@
     <a class="back" href="index.html" title="AICOR dashboard">←</a>
     <div class="logo">◧◧</div>
     <div class="brand-text">
-      <h1>AICOR System · The Full Lab</h1>
-      <p>A mobile robot moving samples through the laboratory, reasoning about navigation &amp; safety policies</p>
+      <h1>AICOR System · Pharma-Lab Automation</h1>
+      <p>Events pop up across the lab — the mobile robot resolves them under the lab's safety policies</p>
     </div>
   </div>
   <div class="topbar-actions">
@@ -24,23 +24,37 @@
 <main class="split">
   <section class="panel panel-left">
     <div class="panel-head">
-      <h2>HSR · mobile lab transport</h2>
-      <span class="kb-status">Toyota HSR</span>
+      <h2>Live lab operations</h2>
+      <button id="game-btn" class="play-btn">▶ Start shift</button>
     </div>
 
     <div class="stage">
       <div id="viewer"></div>
       <div id="viewer-status" class="viewer-status">Loading the lab…</div>
+
+      <!-- game HUD -->
+      <div id="hud" class="hud">
+        <div class="hud-metric">
+          <span class="hud-label">Compliance</span>
+          <div class="meter"><div id="compliance-bar" class="meter-fill"></div></div>
+        </div>
+        <div class="hud-stat"><span id="hud-score">0</span><small>resolved</small></div>
+        <div class="hud-stat"><span id="hud-missed">0</span><small>missed</small></div>
+      </div>
+
+      <!-- clickable event bubbles are positioned here over the 3D view -->
+      <div id="events" class="events"></div>
+
       <div id="step-caption" class="step-caption hidden"></div>
-      <div class="stage-hint">drag to orbit · scroll to zoom</div>
+      <div class="stage-hint">drag orbit · scroll zoom · click a glowing event to dispatch the robot</div>
     </div>
 
     <div class="workflow">
       <div class="workflow-head">
-        <span>Laboratory transport tasks</span>
-        <button id="play-btn" class="play-btn">▶ Run the lab</button>
+        <span>How it works</span>
+        <small>click an event → robot drives there &amp; resolves it · ignore it → compliance drops</small>
       </div>
-      <div id="workflow-strip" class="workflow-strip"><!-- filled by JS --></div>
+      <div id="game-legend" class="game-legend"><!-- filled by JS --></div>
     </div>
   </section>
 
@@ -60,7 +74,7 @@
     </div>
 
     <div id="answer" class="answer">
-      <div class="answer-empty">Pick a transport task or a question. Clicking a node in the graph highlights the related stations, objects and tasks on the left.</div>
+      <div class="answer-empty">Start the shift and handle events. When the robot resolves one, the safety policies and CRAM actions it obeys show up here and light up in the graph.</div>
     </div>
 
     <div class="graph-wrap">

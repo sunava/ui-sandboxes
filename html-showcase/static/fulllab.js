@@ -180,6 +180,34 @@
 
   function goHome() { nav.queue = [{ x: 0, z: 0, face: null, on: function () { highlightStations([]); payload.visible = false; } }]; nav.cur = null; }
 
+  // ---- game: drive to a station, "work" briefly, then report done -----------
+  let busy = false;
+  function serve(id, objId, cb) {
+    if (!STATIONS[id]) { if (cb) cb(); return; }
+    busy = true;
+    const a = approach(id);
+    nav.queue = [{ x: a.x, z: a.z, face: id, on: function () {
+      highlightStations([id]);
+      if (objId) showPayload(objId);
+      captionCb('serve', id, objId);
+      setTimeout(function () {
+        payload.visible = false; highlightStations([]); busy = false;
+        if (cb) cb();
+      }, 800);
+    } }];
+    nav.cur = null;
+  }
+  function isBusy() { return busy; }
+
+  // project a station's world position to viewer pixel coords (for HTML bubbles)
+  const _pv = new THREE.Vector3();
+  function projectToScreen(id) {
+    const s = STATIONS[id]; if (!s || !camera) return null;
+    _pv.set(s.x, 0.95, s.z).project(camera);
+    const w = container.clientWidth, h = container.clientHeight;
+    return { x: (_pv.x * 0.5 + 0.5) * w, y: (-_pv.y * 0.5 + 0.5) * h, visible: _pv.z < 1 };
+  }
+
   function showPayload(objId) {
     const c = OBJECT_COLORS[objId] || 0x9fd3e6;
     payload.material.color.setHex(c);
@@ -246,6 +274,10 @@
     onReady: function (cb) { if (robot) cb(); else readyCbs.push(cb); },
     runTask: runTask,
     goHome: goHome,
+    serve: serve,
+    isBusy: isBusy,
+    projectToScreen: projectToScreen,
+    stations: function () { return STATIONS; },
     highlightStations: highlightStations,
     onCaption: function (cb) { captionCb = cb; },
   };
