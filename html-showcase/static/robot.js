@@ -10,6 +10,7 @@
   const statusEl = document.getElementById('viewer-status');
 
   const scene = new THREE.Scene();
+  window.__scene = scene; // TEMP DEBUG
   // transparent — the blurred lab photo behind the canvas shows through
   scene.background = null;
 
@@ -134,13 +135,16 @@
     if (btn) btn.click();
   });
 
-  // finalize once all meshes have loaded (or shortly after, as a fallback)
-  manager.onLoad = finalize;
+  // finalize once all meshes have loaded (or shortly after, as a fallback).
+  // If the fallback fired first, late-arriving meshes (notably the big table
+  // STL) still get their materials once everything is really loaded.
+  manager.onLoad = function () {
+    if (finalized) { applyMaterials(); frameToRobot(); needsRender = true; }
+    else finalize();
+  };
   setTimeout(function () { if (robot) finalize(); }, 4000);
 
-  function finalize() {
-    if (finalized || !robot) return;
-    finalized = true;
+  function applyMaterials() {
     // upgrade every mesh to a PBR material so the environment map gives it
     // realistic metal/plastic reflections
     robot.traverse(function (c) {
@@ -153,21 +157,38 @@
       c.material = wasArray ? up : up[0];
     });
 
-    // give the bench (by far the largest mesh) a grey brushed-metal look
-    let bench = null, benchVol = 0;
-    robot.traverse(function (c) {
-      if (!c.isMesh) return;
-      const b = new THREE.Box3().setFromObject(c);
-      const s = b.getSize(new THREE.Vector3());
-      const v = s.x * s.y * s.z;
-      if (v > benchVol) { benchVol = v; bench = c; }
+    // dark graphite bench: colour every mesh of the URDF `table` link so the
+    // reagents stand out clearly against it (low metalness/reflections keep it
+    // genuinely dark under the bright studio HDRI)
+    const benchMat = new THREE.MeshStandardMaterial({
+      color: 0x23262b, metalness: 0.35, roughness: 0.55, envMapIntensity: 0.3,
     });
-    if (bench) {
-      // dark graphite metal: reagents stand out clearly against it
-      bench.material = new THREE.MeshStandardMaterial({
-        color: 0x2b2f36, metalness: 0.82, roughness: 0.3, envMapIntensity: 0.85,
+    const tableLink = robot.links && robot.links.table;
+    if (tableLink) {
+      // only the link's own visuals — the arms and camera pole are child links
+      // of `table` in the kinematic tree and must keep their materials
+      tableLink.children.forEach(function (child) {
+        if (child.isURDFLink || child.isURDFJoint) return;
+        child.traverse(function (c) { if (c.isMesh) c.material = benchMat; });
       });
+    } else {
+      // fallback: the bench is by far the largest mesh
+      let bench = null, benchVol = 0;
+      robot.traverse(function (c) {
+        if (!c.isMesh) return;
+        const b = new THREE.Box3().setFromObject(c);
+        const s = b.getSize(new THREE.Vector3());
+        const v = s.x * s.y * s.z;
+        if (v > benchVol) { benchVol = v; bench = c; }
+      });
+      if (bench) bench.material = benchMat;
     }
+  }
+
+  function finalize() {
+    if (finalized || !robot) return;
+    finalized = true;
+    applyMaterials();
 
     // drop the ground/grid to the robot's real base so the bench stands on it
     const rb = new THREE.Box3().setFromObject(robot);
