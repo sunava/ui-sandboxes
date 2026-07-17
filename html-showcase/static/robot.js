@@ -40,7 +40,7 @@
         hdr.mapping = THREE.EquirectangularReflectionMapping;
         const pm = new THREE.PMREMGenerator(renderer);
         scene.environment = pm.fromEquirectangular(hdr).texture;
-        hdr.dispose(); pm.dispose();
+        hdr.dispose(); pm.dispose(); needsRender = true;
       });
     } catch (e) { /* HDRI optional, RoomEnvironment stays */ }
   }
@@ -124,6 +124,7 @@
     setPoseInstant(POSES.prep);
 
     scene.add(robot);
+    needsRender = true;
   },
   undefined,
   function (err) {                             // onError
@@ -174,6 +175,7 @@
     frameToRobot();
     statusEl.classList.add('hidden');
     readyCbs.forEach(function (cb) { cb(); });
+    needsRender = true;
 
     // load the real CRAM/giskardpy trajectory and build the objects at the exact
     // map-frame coordinates the arm reaches for them (so arm and objects align)
@@ -183,6 +185,7 @@
         traj = d;
         gripperLinkObj = (robot.links && robot.links[d.gripperLink]) || null;
         if (d.objects) buildProps(d.objects);
+        needsRender = true;
       })
       .catch(function () {});
   }
@@ -563,36 +566,53 @@
   // ---- render loop ----------------------------------------------------------
   const clock = new THREE.Clock();
   const EASE = 0.07;
+  let needsRender = true;                     // render on demand; idle = GPU free
+  controls.addEventListener('change', function () { needsRender = true; });
+
+  // is anything actually animating right now? (pose easing, glow, trajectory…)
+  function animating() {
+    if (!robot) return false;
+    if (trajPlaying || controls.autoRotate || highlightT > 0) return true;
+    for (const k in JMAP) {
+      const j = robot.joints[JMAP[k]];
+      if (j && Math.abs((j.angle || 0) - target[k]) > 1e-3) return true;
+    }
+    if (Math.abs(lg - target.lg) > 1e-3 || Math.abs(rg - target.rg) > 1e-3) return true;
+    for (const id in props) {
+      const p = props[id];
+      if (p.glow > 1e-3 || Math.abs(p.glow - p.glowTarget) > 1e-3) return true;
+    }
+    return false;
+  }
+
   function tick() {
     requestAnimationFrame(tick);
     const t = clock.getElapsedTime();
+    const active = animating();
+    const moved = controls.update();          // true while orbiting / damping
+    // skip the (transmission-heavy) render entirely when nothing changed —
+    // this frees the GPU so dragging the knowledge graph stays smooth
+    if (!active && !moved && !needsRender) return;
 
     if (robot && trajPlaying && traj) {
-      // play the real giskardpy trajectory frame-by-frame (overrides poses)
       stepTrajectory();
     } else if (robot) {
-      // ease every controlled arm joint toward its target (deterministic)
       for (const k in JMAP) {
         const j = robot.joints[JMAP[k]];
         if (!j) continue;
         const cur = j.angle || 0;
         j.setJointValue(cur + (target[k] - cur) * EASE);
       }
-      // ease the grippers too
       lg += (target.lg - lg) * EASE; rg += (target.rg - rg) * EASE;
       setGripperSide('left', lg); setGripperSide('right', rg);
     }
     if (robot) {
-
-      // highlight = a brief teal glow from the fill light (no arm motion)
       if (highlightT > 0) {
         highlightT -= 0.016;
         fill.intensity = 0.5 + Math.abs(Math.sin(t * 6)) * 1.2;
       } else {
         fill.intensity += (0.5 - fill.intensity) * 0.1;
       }
-
-      // ease each bench object's glow toward its target
       const pulse = 0.6 + 0.4 * Math.abs(Math.sin(t * 3));
       for (const id in props) {
         const p = props[id];
@@ -607,8 +627,8 @@
       }
     }
 
-    controls.update();
     renderer.render(scene, camera);
+    needsRender = false;
   }
   let lg = POSES.prep.lg, rg = POSES.prep.rg;
   tick();
@@ -619,17 +639,17 @@
     if (!w || !h) return;
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
-    camera.updateProjectionMatrix();
+    camera.updateProjectionMatrix(); needsRender = true;
   }
   window.addEventListener('resize', resize);
   new ResizeObserver(resize).observe(container);
   resize();
 
   // ---- view toggles for the floating LAYERS panel ---------------------------
-  function setPropsVisible(on) { for (const id in props) props[id].group.visible = on; }
-  function setLabelsAlways(on) { for (const id in props) if (props[id].label) props[id].label.visible = on; }
+  function setPropsVisible(on) { for (const id in props) props[id].group.visible = on; needsRender = true; }
+  function setLabelsAlways(on) { for (const id in props) if (props[id].label) props[id].label.visible = on; needsRender = true; }
   function setAutoRotate(on) { controls.autoRotate = on; controls.autoRotateSpeed = 0.6; }
-  function setFloorVisible(on) { ground.visible = on; grid.visible = on; }
+  function setFloorVisible(on) { ground.visible = on; grid.visible = on; needsRender = true; }
 
   window.RobotView = {
     onReady: function (cb) { if (robot) cb(); else readyCbs.push(cb); },
