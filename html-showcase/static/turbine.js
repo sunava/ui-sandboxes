@@ -54,11 +54,11 @@
   const manager = new THREE.LoadingManager();
   const loader = new URDFLoader(manager);
   loader.packages = {
-    ur_description: '/static/meshes/ur_description',
-    robotiq_description: '/static/meshes/robotiq_description',
-    iai_tracy_description: '/static/meshes/iai_tracy_description',
+    ur_description: 'static/meshes/ur_description',
+    robotiq_description: 'static/meshes/robotiq_description',
+    iai_tracy_description: 'static/meshes/iai_tracy_description',
   };
-  loader.load('/static/tracy.urdf', function (model) {
+  loader.load('static/tracy.urdf', function (model) {
     robot = model; robot.rotation.x = -Math.PI / 2; scene.add(robot);
   }, undefined, function (err) {
     console.error(err); statusEl.textContent = 'Could not load Tracy.';
@@ -75,7 +75,7 @@
     if (isFinite(rb.min.y)) { ground.position.y = rb.min.y; grid.position.y = rb.min.y + 0.002; }
     frameToRobot();
     statusEl.classList.add('hidden');
-    fetch('/static/turbine_trajectory.json').then(function (r) { return r.ok ? r.json() : null; })
+    fetch('static/turbine_trajectory.json').then(function (r) { return r.ok ? r.json() : null; })
       .then(function (d) { if (d) { traj = d; buildParts(); readyCbs.forEach(function (cb) { cb(); }); } })
       .catch(function () {});
   }

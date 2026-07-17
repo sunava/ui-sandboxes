@@ -110,8 +110,8 @@
 
   const manager = new THREE.LoadingManager();
   const loader = new URDFLoader(manager);
-  loader.packages = { hsr_description: '/static/meshes/hsr_description' };
-  loader.load('/static/hsrb.urdf', function (model) {
+  loader.packages = { hsr_description: 'static/meshes/hsr_description' };
+  loader.load('static/hsrb.urdf', function (model) {
     robot = model;
     robot.rotation.x = -Math.PI / 2;          // Z-up → Y-up
     // a neutral "carrying" arm pose

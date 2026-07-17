@@ -68,7 +68,7 @@ body{
   radial-gradient(700px 500px at 50% 25%, #17253d 0%, #0a1120 70%);}
 /* blurred real-lab backdrop (the robot is composited on top, "sandbox" style) */
 .stage-bg{position:absolute;inset:0;z-index:0;
-  background:url('/static/img/tracy_robot.jpg') center/cover no-repeat;
+  background:url('img/tracy_robot.jpg') center/cover no-repeat;
   filter:blur(16px) brightness(.62) saturate(1.05);
   transform:scale(1.12);            /* overscan so blurred edges stay off-screen */
 }

@@ -99,12 +99,12 @@
 
   const loader = new URDFLoader(manager);
   loader.packages = {
-    ur_description: '/static/meshes/ur_description',
-    robotiq_description: '/static/meshes/robotiq_description',
-    iai_tracy_description: '/static/meshes/iai_tracy_description',
+    ur_description: 'static/meshes/ur_description',
+    robotiq_description: 'static/meshes/robotiq_description',
+    iai_tracy_description: 'static/meshes/iai_tracy_description',
   };
 
-  loader.load('/static/tracy.urdf', function (model) {
+  loader.load('static/tracy.urdf', function (model) {
     robot = model;
     robot.rotation.x = -Math.PI / 2;          // URDF Z-up → Three Y-up
 
@@ -165,7 +165,7 @@
 
     // load the real CRAM/giskardpy trajectory and build the objects at the exact
     // map-frame coordinates the arm reaches for them (so arm and objects align)
-    fetch('/static/trajectory.json').then(function (r) { return r.ok ? r.json() : null; })
+    fetch('static/trajectory.json').then(function (r) { return r.ok ? r.json() : null; })
       .then(function (d) {
         if (!d) return;
         traj = d;
