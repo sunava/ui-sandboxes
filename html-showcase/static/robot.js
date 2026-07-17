@@ -454,10 +454,17 @@
     const size = box.getSize(new THREE.Vector3());
     const center = box.getCenter(new THREE.Vector3());
     controls.target.copy(center);
-    const maxDim = Math.max(size.x, size.y, size.z);
-    const dist = maxDim / (2 * Math.tan((camera.fov * Math.PI) / 360)) * 1.35;
-    camera.position.set(center.x + dist * 0.75, center.y + maxDim * 0.55, center.z + dist * 0.85);
-    camera.near = dist / 50; camera.far = dist * 50;
+
+    // fit BOTH height and width for the current (often wide) viewport, with margin
+    const fov = (camera.fov * Math.PI) / 180;
+    const aspect = camera.aspect || (container.clientWidth / Math.max(1, container.clientHeight)) || 1.6;
+    const fitH = (size.y / 2) / Math.tan(fov / 2);
+    const fitW = (Math.max(size.x, size.z) / 2) / (Math.tan(fov / 2) * aspect);
+    const dist = Math.max(fitH, fitW) * 1.45;
+
+    // look slightly down from the front so the whole robot stays in frame
+    camera.position.set(center.x + dist * 0.55, center.y + size.y * 0.12, center.z + dist * 0.9);
+    camera.near = Math.max(0.01, dist / 100); camera.far = dist * 100;
     camera.updateProjectionMatrix();
     controls.update();
   }
