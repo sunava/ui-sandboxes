@@ -500,9 +500,9 @@
   //   lg/rg: left/right gripper (0 open … 0.8 closed)
   function P(o) { return o; }
   const POSES = {
-    // ready — both arms reach forward & down over the bench, grippers hovering
-    // above the workspace (like the real robot photos), hands open
-    prep:            P({ lpan: .28, llift:-1.25, lelb:1.35, lw1:-1.60, lw2:-1.57, lw3:0,   rpan:-.28, rlift:-1.25, relb:-1.35, rw1:-1.60, rw2:1.57, rw3:0,   lg:.08, rg:.08 }),
+    // ready — both arms reach forward & down over the bench (REAL giskardpy
+    // joint values captured from a two-arm reach; matches the robot photos)
+    prep:            P({ lpan: 2.939, llift:-1.473, lelb:2.132, lw1:-1.879, lw2:-0.558, lw3:2.739, rpan: 3.345, rlift:-1.668, relb:-2.131, rw1:5.018, rw2:0.558, rw3:-2.737, lg:.08, rg:.08 }),
     // wiping the bench surface — both hands low, sweeping outward
     disinfect:       P({ lpan: .35, llift:-1.30, lelb:1.20, lw1:-1.45, lw2:-1.57, lw3:.35, rpan:-.35, rlift:-1.30, relb:-1.20, rw1:-1.45, rw2:1.57, rw3:-.35, lg:.25, rg:.25 }),
     // meet in the centre, right hand twists the canister cap open
@@ -520,7 +520,7 @@
     // retract low & back so the pole camera has a clear look at the canister
     inspect:         P({ lpan: .80, llift:-2.20, lelb:2.05, lw1:-1.35, lw2:-1.57, lw3:0,   rpan:-.80, rlift:-2.15, relb:-2.05, rw1:-1.35, rw2:1.57, rw3:0,  lg:.10, rg:.10 }),
     // back to the ready-over-bench pose while the audit trail is written
-    document:        P({ lpan: .28, llift:-1.25, lelb:1.35, lw1:-1.60, lw2:-1.57, lw3:0,   rpan:-.28, rlift:-1.25, relb:-1.35, rw1:-1.60, rw2:1.57, rw3:0,  lg:.08, rg:.08 }),
+    document:        P({ lpan: 2.939, llift:-1.473, lelb:2.132, lw1:-1.879, lw2:-0.558, lw3:2.739, rpan: 3.345, rlift:-1.668, relb:-2.131, rw1:5.018, rw2:0.558, rw3:-2.737, lg:.08, rg:.08 }),
   };
 
   const JMAP = {
