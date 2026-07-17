@@ -163,9 +163,9 @@
       if (v > benchVol) { benchVol = v; bench = c; }
     });
     if (bench) {
-      // darker polished silver: lower base colour, high metalness, low roughness
+      // dark graphite metal: reagents stand out clearly against it
       bench.material = new THREE.MeshStandardMaterial({
-        color: 0x5f6670, metalness: 0.85, roughness: 0.22, envMapIntensity: 1.1,
+        color: 0x2b2f36, metalness: 0.82, roughness: 0.3, envMapIntensity: 0.85,
       });
     }
 
