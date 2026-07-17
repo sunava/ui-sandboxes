@@ -33,6 +33,17 @@
       scene.environment = pmrem.fromScene(new THREE.RoomEnvironment(), 0.04).texture;
     } catch (e) { /* IBL optional */ }
   }
+  // upgrade to a real studio HDRI when it loads → photorealistic reflections
+  if (THREE.RGBELoader && THREE.PMREMGenerator) {
+    try {
+      new THREE.RGBELoader().load('static/env/studio.hdr', function (hdr) {
+        hdr.mapping = THREE.EquirectangularReflectionMapping;
+        const pm = new THREE.PMREMGenerator(renderer);
+        scene.environment = pm.fromEquirectangular(hdr).texture;
+        hdr.dispose(); pm.dispose();
+      });
+    } catch (e) { /* HDRI optional, RoomEnvironment stays */ }
+  }
 
   // ---- lighting: warm-neutral to match the real lab photo -------------------
   scene.add(new THREE.HemisphereLight(0xf4efe6, 0x2a2d33, 0.7));
