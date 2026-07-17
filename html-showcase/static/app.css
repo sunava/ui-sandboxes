@@ -1,10 +1,10 @@
 :root{
-  --bg:#0b1220; --bg2:#0f1a2e; --panel:#111c31; --panel2:#0d1729;
-  --ink:#e8eefb; --muted:#93a4c4; --faint:#5f7196;
-  --line:#1e2d47; --line2:#283a5c;
+  --bg:#050608; --bg2:#0c0e12; --panel:#0b0d11; --panel2:#070809;
+  --ink:#e8eef6; --muted:#8b93a3; --faint:#5a6270;
+  --line:#20242c; --line2:#2c313b;
   --accent:#39d5c8; --accent2:#5b8cff; --warn:#ffb648; --danger:#ff6b8b;
   --obj:#5b8cff; --step:#39d5c8; --action:#b98cff; --reg:#ffb648; --robot:#ff7a9c;
-  --radius:14px; --shadow:0 10px 40px rgba(0,0,0,.45);
+  --radius:4px; --shadow:0 8px 30px rgba(0,0,0,.6);
   --font:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
   --mono:"JetBrains Mono","SF Mono",ui-monospace,Menlo,monospace;
 }
@@ -13,8 +13,8 @@ html,body{height:100%}
 body{
   margin:0;font-family:var(--font);color:var(--ink);
   background:
-    radial-gradient(1200px 700px at 15% -10%, #16263f 0%, transparent 55%),
-    radial-gradient(1000px 600px at 100% 0%, #142138 0%, transparent 50%),
+    radial-gradient(1200px 700px at 15% -10%, #0b0d12 0%, transparent 55%),
+    radial-gradient(1000px 600px at 100% 0%, #0a0c11 0%, transparent 50%),
     var(--bg);
   display:flex;flex-direction:column;overflow:hidden;
 }
@@ -23,12 +23,12 @@ body{
 .topbar{
   display:flex;align-items:center;justify-content:space-between;
   padding:14px 22px;border-bottom:1px solid var(--line);
-  background:linear-gradient(180deg,rgba(20,33,56,.75),rgba(11,18,32,.4));
+  background:linear-gradient(180deg,rgba(14,16,20,.9),rgba(6,7,9,.6));
   backdrop-filter:blur(6px);
 }
 .brand{display:flex;align-items:center;gap:14px}
 .logo{
-  width:42px;height:42px;border-radius:12px;display:grid;place-items:center;
+  width:42px;height:42px;border-radius:4px;display:grid;place-items:center;
   font-size:20px;letter-spacing:-3px;color:#04121a;font-weight:800;
   background:linear-gradient(135deg,var(--accent),var(--accent2));
   box-shadow:0 6px 20px rgba(57,213,200,.35);
@@ -37,7 +37,7 @@ body{
 .brand-text p{margin:2px 0 0;font-size:12.5px;color:var(--muted)}
 .topbar-actions .ext{
   color:var(--accent);text-decoration:none;font-size:13px;font-weight:600;
-  padding:8px 14px;border:1px solid var(--line2);border-radius:10px;
+  padding:8px 14px;border:1px solid var(--line2);border-radius:4px;
   transition:.15s;
 }
 .topbar-actions .ext:hover{background:var(--panel);border-color:var(--accent)}
@@ -56,7 +56,7 @@ body{
 .panel-head h2{margin:0;font-size:15px;font-weight:700}
 
 /* view toggle */
-.view-toggle{display:flex;background:var(--bg2);border:1px solid var(--line2);border-radius:10px;overflow:hidden}
+.view-toggle{display:flex;background:var(--bg2);border:1px solid var(--line2);border-radius:4px;overflow:hidden}
 .view-toggle button{
   background:transparent;border:0;color:var(--muted);font:inherit;font-size:12.5px;
   padding:6px 13px;cursor:pointer;transition:.15s
@@ -65,7 +65,7 @@ body{
 
 /* ----------------------------------------------------------- 3d stage --- */
 .stage{position:relative;flex:1;min-height:0;background:
-  radial-gradient(700px 500px at 50% 25%, #17253d 0%, #0a1120 70%);}
+  radial-gradient(700px 500px at 50% 25%, #0a0c11 0%, #050608 70%);}
 /* blurred real-lab backdrop (the robot is composited on top, "sandbox" style) */
 .stage-bg{position:absolute;inset:0;z-index:0;
   background:url('img/tracy_robot.jpg') center/cover no-repeat;
@@ -81,12 +81,12 @@ body{
 .viewer-status{
   position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
   color:var(--muted);font-size:13px;letter-spacing:.3px;
-  padding:10px 16px;border:1px solid var(--line2);border-radius:10px;background:rgba(10,17,32,.6)
+  padding:10px 16px;border:1px solid var(--line2);border-radius:4px;background:rgba(10,17,32,.6)
 }
 .stage-hint{position:absolute;left:14px;bottom:12px;z-index:4;font-size:11px;color:var(--faint);letter-spacing:.4px}
 .layers-panel{
   position:absolute;left:14px;top:14px;z-index:3;min-width:180px;
-  background:rgba(12,20,34,.72);border:1px solid var(--line2);border-radius:12px;
+  background:rgba(12,20,34,.72);border:1px solid var(--line2);border-radius:4px;
   padding:12px 13px;backdrop-filter:blur(7px);box-shadow:0 8px 26px rgba(0,0,0,.4)
 }
 .lp-title{font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin-bottom:9px}
@@ -99,7 +99,7 @@ body{
 .step-caption{
   position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:4;
   max-width:82%;text-align:center;font-size:13px;line-height:1.4;color:var(--ink);
-  padding:9px 16px;border-radius:11px;border:1px solid var(--line2);
+  padding:9px 16px;border-radius:4px;border:1px solid var(--line2);
   background:rgba(10,17,32,.78);backdrop-filter:blur(6px);
   box-shadow:0 8px 24px rgba(0,0,0,.4)
 }
@@ -107,7 +107,7 @@ body{
 
 .play-btn{
   background:var(--bg2);border:1px solid var(--line2);color:var(--accent);
-  font:inherit;font-size:12px;font-weight:600;padding:6px 13px;border-radius:9px;cursor:pointer;transition:.15s
+  font:inherit;font-size:12px;font-weight:600;padding:6px 13px;border-radius:3px;cursor:pointer;transition:.15s
 }
 .play-btn:hover{border-color:var(--accent)}
 .play-btn.playing{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#04121a;border-color:transparent}
@@ -125,7 +125,7 @@ body{
 .workflow-strip{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px}
 .wstep{
   flex:0 0 auto;display:flex;align-items:center;gap:8px;cursor:pointer;
-  padding:8px 12px;border-radius:10px;border:1px solid var(--line2);
+  padding:8px 12px;border-radius:4px;border:1px solid var(--line2);
   background:var(--bg2);transition:.15s;white-space:nowrap;
 }
 .wstep:hover{border-color:var(--step);transform:translateY(-1px)}
@@ -142,19 +142,19 @@ body{
 .query-box{padding:14px 16px;border-bottom:1px solid var(--line);background:var(--panel2)}
 .query-row{display:flex;gap:8px}
 #query-input{
-  flex:1;background:var(--bg);border:1px solid var(--line2);border-radius:10px;
+  flex:1;background:var(--bg);border:1px solid var(--line2);border-radius:4px;
   color:var(--ink);font-family:var(--mono);font-size:13px;padding:11px 13px;outline:none
 }
 #query-input:focus{border-color:var(--accent)}
 #query-run{
   background:linear-gradient(135deg,var(--accent),var(--accent2));border:0;color:#04121a;
-  font-weight:700;font-size:13px;padding:0 20px;border-radius:10px;cursor:pointer
+  font-weight:700;font-size:13px;padding:0 20px;border-radius:4px;cursor:pointer
 }
 #query-run:active{transform:translateY(1px)}
 .presets{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}
 .preset{
   font-size:12px;color:var(--muted);background:var(--bg2);border:1px solid var(--line2);
-  padding:6px 11px;border-radius:20px;cursor:pointer;transition:.15s
+  padding:6px 11px;border-radius:4px;cursor:pointer;transition:.15s
 }
 .preset:hover{border-color:var(--accent);color:var(--ink)}
 
@@ -165,12 +165,12 @@ body{
 .answer .headline{font-size:13.5px;color:var(--ink);margin:0 0 10px;line-height:1.5}
 .answer .headline b{color:var(--accent)}
 .ansrow{
-  display:flex;align-items:flex-start;gap:10px;padding:8px 10px;border-radius:9px;
+  display:flex;align-items:flex-start;gap:10px;padding:8px 10px;border-radius:3px;
   background:var(--bg2);border:1px solid var(--line);margin-bottom:6px
 }
 .ansrow .tag{
   flex:0 0 auto;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
-  padding:3px 8px;border-radius:6px;color:#04121a
+  padding:3px 8px;border-radius:3px;color:#04121a
 }
 .ansrow .body{font-size:12.5px;line-height:1.45}
 .ansrow .body .name{font-weight:600;color:var(--ink)}
@@ -184,7 +184,7 @@ body{
 #graph{position:absolute;inset:0}
 .legend{
   position:absolute;right:12px;top:12px;display:flex;flex-direction:column;gap:5px;
-  background:rgba(10,17,32,.72);border:1px solid var(--line2);border-radius:10px;padding:9px 11px;
+  background:rgba(10,17,32,.72);border:1px solid var(--line2);border-radius:4px;padding:9px 11px;
   backdrop-filter:blur(4px)
 }
 .legend .li{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted)}
@@ -192,7 +192,7 @@ body{
 
 /* ----------------------------------------------------- back button --- */
 .brand .back{
-  display:grid;place-items:center;width:34px;height:34px;border-radius:9px;
+  display:grid;place-items:center;width:34px;height:34px;border-radius:3px;
   color:var(--muted);text-decoration:none;font-size:18px;border:1px solid var(--line2);
   background:var(--bg2);transition:.15s;margin-right:4px
 }
@@ -208,17 +208,17 @@ body.dash{overflow:auto}
 .card{
   position:relative;display:flex;flex-direction:column;text-decoration:none;color:var(--ink);
   background:linear-gradient(180deg,var(--panel),var(--panel2));
-  border:1px solid var(--line);border-radius:18px;padding:22px;overflow:hidden;
+  border:1px solid var(--line);border-radius:4px;padding:22px;overflow:hidden;
   box-shadow:var(--shadow);transition:.18s
 }
 .card:hover{transform:translateY(-4px);border-color:var(--line2)}
 .card:hover .card-go{color:var(--accent)}
 .card-badge{
   position:absolute;top:16px;right:16px;font-size:10px;font-weight:800;letter-spacing:1px;
-  color:var(--c);border:1px solid var(--c);border-radius:20px;padding:3px 9px;opacity:.9
+  color:var(--c);border:1px solid var(--c);border-radius:4px;padding:3px 9px;opacity:.9
 }
 .card-art{
-  height:120px;border-radius:12px;margin-bottom:16px;display:grid;place-items:center;
+  height:120px;border-radius:4px;margin-bottom:16px;display:grid;place-items:center;
   border:1px solid var(--line)
 }
 .art-tracy{background:radial-gradient(400px 200px at 40% 20%,#17384a,#0e1c2e)}
@@ -235,7 +235,7 @@ body.dash{overflow:auto}
 
 /* -------------------------------------------- LISP designator block --- */
 .designator{
-  margin:6px 0 2px;background:#0a1526;border:1px solid var(--line2);border-radius:9px;
+  margin:6px 0 2px;background:#0a1526;border:1px solid var(--line2);border-radius:3px;
   padding:11px 13px;overflow-x:auto
 }
 .designator pre{margin:0;font-family:var(--mono);font-size:12px;line-height:1.5;color:#c7d4ec;white-space:pre}
