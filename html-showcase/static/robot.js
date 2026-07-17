@@ -500,8 +500,9 @@
   //   lg/rg: left/right gripper (0 open … 0.8 closed)
   function P(o) { return o; }
   const POSES = {
-    // parked / ready — arms up and back, hands open
-    prep:            P({ lpan: .55, llift:-2.05, lelb:1.95, lw1:-1.45, lw2:-1.57, lw3:0,   rpan:-.55, rlift:-1.05, relb:-1.95, rw1:-1.45, rw2:1.57, rw3:0,   lg:.05, rg:.05 }),
+    // ready — both arms reach forward & down over the bench, grippers hovering
+    // above the workspace (like the real robot photos), hands open
+    prep:            P({ lpan: .28, llift:-1.25, lelb:1.35, lw1:-1.60, lw2:-1.57, lw3:0,   rpan:-.28, rlift:-1.25, relb:-1.35, rw1:-1.60, rw2:1.57, rw3:0,   lg:.08, rg:.08 }),
     // wiping the bench surface — both hands low, sweeping outward
     disinfect:       P({ lpan: .35, llift:-1.30, lelb:1.20, lw1:-1.45, lw2:-1.57, lw3:.35, rpan:-.35, rlift:-1.30, relb:-1.20, rw1:-1.45, rw2:1.57, rw3:-.35, lg:.25, rg:.25 }),
     // meet in the centre, right hand twists the canister cap open
@@ -518,8 +519,8 @@
     incubate:        P({ lpan: .95, llift:-1.10, lelb:1.05, lw1:-1.50, lw2:-1.57, lw3:0,   rpan:-.95, rlift:-1.05, relb:-1.05, rw1:-1.50, rw2:1.57, rw3:0,  lg:.85, rg:.85 }),
     // retract low & back so the pole camera has a clear look at the canister
     inspect:         P({ lpan: .80, llift:-2.20, lelb:2.05, lw1:-1.35, lw2:-1.57, lw3:0,   rpan:-.80, rlift:-2.15, relb:-2.05, rw1:-1.35, rw2:1.57, rw3:0,  lg:.10, rg:.10 }),
-    // parked again while the audit trail is written
-    document:        P({ lpan: .55, llift:-2.05, lelb:1.95, lw1:-1.45, lw2:-1.57, lw3:0,   rpan:-.55, rlift:-1.05, relb:-1.95, rw1:-1.45, rw2:1.57, rw3:0,  lg:.05, rg:.05 }),
+    // back to the ready-over-bench pose while the audit trail is written
+    document:        P({ lpan: .28, llift:-1.25, lelb:1.35, lw1:-1.60, lw2:-1.57, lw3:0,   rpan:-.28, rlift:-1.25, relb:-1.35, rw1:-1.60, rw2:1.57, rw3:0,  lg:.08, rg:.08 }),
   };
 
   const JMAP = {
