@@ -320,14 +320,26 @@
 
     function addBottle(id, pos, h, r, liquidColor, level, label) {
       const g = new THREE.Group();
-      const glassMat = new THREE.MeshStandardMaterial({ color: 0xdfe9f5, transparent: true, opacity: 0.28, roughness: 0.08, metalness: 0 });
-      const glass = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 24), glassMat);
-      const liqMat = new THREE.MeshStandardMaterial({ color: liquidColor, roughness: 0.35, metalness: 0 });
+      // real glass: physical transmission + refraction (needs scene.environment)
+      const glassMat = new THREE.MeshPhysicalMaterial({
+        color: 0xffffff, metalness: 0, roughness: 0.04,
+        transmission: 1.0, ior: 1.5, thickness: r * 1.6,
+        transparent: true, envMapIntensity: 1.2,
+        clearcoat: 0.4, clearcoatRoughness: 0.08,
+      });
+      const glass = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 48, 1, true), glassMat);
+      // translucent, refracting reagent liquid
+      const liqMat = new THREE.MeshPhysicalMaterial({
+        color: liquidColor, metalness: 0, roughness: 0.12,
+        transmission: 0.55, ior: 1.34, thickness: r * 1.4,
+        transparent: true, opacity: 0.92, envMapIntensity: 0.7, attenuationDistance: 0.06,
+        attenuationColor: new THREE.Color(liquidColor),
+      });
       const lh = h * level;
-      const liq = new THREE.Mesh(new THREE.CylinderGeometry(r * 0.9, r * 0.9, lh, 24), liqMat);
+      const liq = new THREE.Mesh(new THREE.CylinderGeometry(r * 0.92, r * 0.92, lh, 48), liqMat);
       liq.position.y = -h / 2 + lh / 2;
-      const capMat = new THREE.MeshStandardMaterial({ color: 0xeef2f7, roughness: 0.5 });
-      const cap = new THREE.Mesh(new THREE.CylinderGeometry(r * 0.6, r * 0.6, h * 0.12, 20), capMat);
+      const capMat = new THREE.MeshStandardMaterial({ color: 0xf2f5fa, roughness: 0.35, metalness: 0.1, envMapIntensity: 0.8 });
+      const cap = new THREE.Mesh(new THREE.CylinderGeometry(r * 0.62, r * 0.62, h * 0.12, 32), capMat);
       cap.position.y = h / 2 + h * 0.05;
       [glass, liq, cap].forEach(function (m) { m.castShadow = true; g.add(m); });
       register(id, g, [glassMat, liqMat], h, pos, label);
@@ -336,20 +348,27 @@
     function addCanister(id, pos, label) {
       const g = new THREE.Group();
       const h = 0.11, r = 0.052;
-      const bodyMat = new THREE.MeshStandardMaterial({ color: 0xcfe6ef, transparent: true, opacity: 0.4, roughness: 0.1 });
-      const body = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 28), bodyMat);
-      const baseMat = new THREE.MeshStandardMaterial({ color: 0x2f6fb0, roughness: 0.5 });
-      const base = new THREE.Mesh(new THREE.CylinderGeometry(r * 1.1, r * 1.15, h * 0.28, 28), baseMat);
+      const bodyMat = new THREE.MeshPhysicalMaterial({
+        color: 0xffffff, metalness: 0, roughness: 0.06,
+        transmission: 0.95, ior: 1.5, thickness: 0.01,
+        transparent: true, envMapIntensity: 1.1, clearcoat: 0.4, clearcoatRoughness: 0.1,
+      });
+      const body = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 48, 1, true), bodyMat);
+      const baseMat = new THREE.MeshStandardMaterial({ color: 0x2f6fb0, roughness: 0.4, metalness: 0.3, envMapIntensity: 0.9 });
+      const base = new THREE.Mesh(new THREE.CylinderGeometry(r * 1.1, r * 1.15, h * 0.28, 48), baseMat);
       base.position.y = -h / 2 - h * 0.08;
-      const portMat = new THREE.MeshStandardMaterial({ color: 0x9aa7bd, roughness: 0.4 });
+      const portMat = new THREE.MeshStandardMaterial({ color: 0xaab4c4, roughness: 0.3, metalness: 0.6, envMapIntensity: 1.0 });
       [-1, 1].forEach(function (s) {
-        const p = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.05, 12), portMat);
+        const p = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.05, 16), portMat);
         p.position.set(s * 0.018, h / 2 + 0.025, 0); g.add(p);
       });
       [body, base].forEach(function (m) { m.castShadow = true; g.add(m); });
-      // growable liquid column inside the canister (unit height, driven by scale.y)
-      const liqMat = new THREE.MeshStandardMaterial({ color: 0x8fd0e0, transparent: true, opacity: 0.8, roughness: 0.25, emissive: 0x2a6070, emissiveIntensity: 0.2 });
-      const liquid = new THREE.Mesh(new THREE.CylinderGeometry(r * 0.86, r * 0.86, 1, 24), liqMat);
+      // growable translucent liquid column inside the canister
+      const liqMat = new THREE.MeshPhysicalMaterial({
+        color: 0x8fd0e0, metalness: 0, roughness: 0.12,
+        transmission: 0.5, ior: 1.34, thickness: r, transparent: true, opacity: 0.9, envMapIntensity: 0.7,
+      });
+      const liquid = new THREE.Mesh(new THREE.CylinderGeometry(r * 0.9, r * 0.9, 1, 48), liqMat);
       liquid.visible = false; g.add(liquid);
       register(id, g, [bodyMat, baseMat], h, pos, label);
       props[id].canLiquid = liquid; props[id].canH = h; props[id].fill = 0;
