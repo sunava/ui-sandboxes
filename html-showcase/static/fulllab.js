@@ -15,7 +15,7 @@
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(45, 1, 0.05, 200);
-  camera.position.set(6.5, 6, 8);
+  camera.position.set(7, 9.5, 7);   // high isometric look-down (lab-overview style)
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -203,7 +203,7 @@
   const _pv = new THREE.Vector3();
   function projectToScreen(id) {
     const s = STATIONS[id]; if (!s || !camera) return null;
-    _pv.set(s.x, 0.95, s.z).project(camera);
+    _pv.set(s.x, 1.7, s.z).project(camera);   // float the bubble above the station
     const w = container.clientWidth, h = container.clientHeight;
     return { x: (_pv.x * 0.5 + 0.5) * w, y: (-_pv.y * 0.5 + 0.5) * h, visible: _pv.z < 1 };
   }

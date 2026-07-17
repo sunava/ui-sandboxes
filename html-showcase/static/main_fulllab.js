@@ -113,11 +113,11 @@
     const el = document.createElement('div');
     el.className = 'ev';
     el.innerHTML = '<div class="ev-ring"></div><div class="ev-icon">' + cfg.icon + '</div>';
-    el.title = cfg.title;
+    el.title = cfg.title + (cfg.why ? ' — ' + cfg.why : '');
     el.addEventListener('click', function () { onClickEvent(station); });
     eventsEl.appendChild(el);
     active[station] = { el: el, ring: el.querySelector('.ev-ring'), task: cfg.task, obj: cfg.obj,
-      title: cfg.title, fail: cfg.fail, born: performance.now(), deadline: performance.now() + EVENT_MS, state: 'waiting' };
+      title: cfg.title, fail: cfg.fail, why: cfg.why, born: performance.now(), deadline: performance.now() + EVENT_MS, state: 'waiting' };
   }
 
   function removeEvent(station) {
@@ -131,6 +131,9 @@
     const ev = active[station]; if (!ev || ev.state !== 'waiting') return;
     ev.state = 'queued'; ev.el.classList.add('queued');
     if (queue.indexOf(station) < 0) queue.push(station);
+    // show "why it matters" straight away, before the robot even arrives
+    answerEl.innerHTML = '<div class="ev-head">→ Dispatching robot — ' + ev.title + '</div>' +
+      (ev.why ? '<div class="why-box"><b>Why it matters:</b> ' + ev.why + '</div>' : '');
     dispatch();
   }
 
@@ -207,6 +210,7 @@
 
     const ok = status === 'resolved';
     let html = '<div class="ev-head ' + (ok ? 'ok' : 'bad') + '">' + (ok ? '✓ Resolved' : '✕ Missed') + ' — ' + ev.title + '</div>';
+    if (ev.why) html += '<div class="why-box"><b>Why it matters:</b> ' + ev.why + '</div>';
     if (!ok) html += '<p class="headline" style="color:#ff9db1">Consequence: ' + ev.fail + '</p>';
     else html += '<p class="headline">The robot handled it while satisfying <b>' + pol.length + '</b> safety policies.</p>';
     html += section('Safety policies enforced', pol);

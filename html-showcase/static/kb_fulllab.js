@@ -154,13 +154,20 @@ if (typeof window !== 'undefined') { window.STATIONS = STATIONS; window.OBJECT_C
  * the KB task whose safety policies/actions are shown when the robot handles it;
  * `fail` is the consequence if the operator ignores it too long. */
 const STATION_EVENTS = {
-  storage:        { icon: '🧴', obj: 'reagent_kit',   title: 'Reagent restock needed',   task: 'fetch_samples',      fail: 'Reagent ran out — batch delayed' },
-  sample_prep:    { icon: '🧪', obj: 'sample_rack',   title: 'New samples to prepare',   task: 'prep_to_centrifuge', fail: 'Samples degraded on the bench' },
-  centrifuge:     { icon: '⚗️', obj: 'specimen',      title: 'Spin-down complete',       task: 'deliver_analysis',   fail: 'Pellet resuspended — re-run needed' },
-  incubator:      { icon: '🧫', obj: 'culture_plate', title: 'Cultures ready to move',   task: 'incubate_cultures',  fail: 'Over-incubation — cultures spoiled' },
-  analyzer:       { icon: '📊', obj: 'specimen',      title: 'Result ready to log',      task: 'deliver_analysis',   fail: 'Result lost — data-integrity flag' },
-  disposal:       { icon: '☣️', obj: 'waste_bag',     title: 'Biohazard waste is full',  task: 'remove_waste',       fail: 'Biohazard spill!' },
-  sterility_cell: { icon: '🧼', obj: 'tsb_supply',    title: 'Resupply the sterility cell', task: 'supply_sterility', fail: 'Sterility breach in the cell' },
+  storage:        { icon: '🧴', obj: 'reagent_kit',   title: 'Reagent restock needed',   task: 'fetch_samples',      fail: 'Reagent ran out — batch delayed',
+                    why: 'Assays stall without reagents; the robot restocks on time and logs the lot for traceability.' },
+  sample_prep:    { icon: '🧪', obj: 'sample_rack',   title: 'New samples to prepare',   task: 'prep_to_centrifuge', fail: 'Samples degraded on the bench',
+                    why: 'Patient samples degrade if left out; timely prep keeps results valid and prevents cross-contamination.' },
+  centrifuge:     { icon: '⚗️', obj: 'specimen',      title: 'Spin-down complete',       task: 'deliver_analysis',   fail: 'Pellet resuspended — re-run needed',
+                    why: 'A finished spin must be collected before the pellet resuspends, or the separation is wasted.' },
+  incubator:      { icon: '🧫', obj: 'culture_plate', title: 'Cultures ready to move',   task: 'incubate_cultures',  fail: 'Over-incubation — cultures spoiled',
+                    why: 'Cultures are only valid within a time window; over-incubation ruins the batch.' },
+  analyzer:       { icon: '📊', obj: 'specimen',      title: 'Result ready to log',      task: 'deliver_analysis',   fail: 'Result lost — data-integrity flag',
+                    why: 'Results must be captured promptly for an intact, auditable data trail (21 CFR Part 11).' },
+  disposal:       { icon: '☣️', obj: 'waste_bag',     title: 'Biohazard waste is full',  task: 'remove_waste',       fail: 'Biohazard spill!',
+                    why: 'Overflowing biohazard waste is a safety hazard; sealed, correct disposal is mandatory.' },
+  sterility_cell: { icon: '🧼', obj: 'tsb_supply',    title: 'Resupply the sterility cell', task: 'supply_sterility', fail: 'Sterility breach in the cell',
+                    why: 'The sterility test must never run dry; resupply follows strict sterile-zone entry rules.' },
 };
 if (typeof window !== 'undefined') window.STATION_EVENTS = STATION_EVENTS;
 

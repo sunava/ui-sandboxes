@@ -294,3 +294,6 @@ body.dash{overflow:auto}
 .ev-head{font-size:13.5px;font-weight:700;margin-bottom:6px}
 .ev-head.ok{color:#4bd38a}
 .ev-head.bad{color:#ff6b8b}
+.why-box{font-size:12.5px;line-height:1.5;color:#cdd6e6;background:rgba(57,213,200,.08);
+  border-left:3px solid var(--accent);border-radius:3px;padding:8px 11px;margin:2px 0 10px}
+.why-box b{color:var(--accent)}
