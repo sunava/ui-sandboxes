@@ -1,0 +1,114 @@
+# Worked-example ABox — "Pour the Milk into the Mug"
+# A pouring action axiomatized in the interval temporal logic (holds/occurs over
+# intervals) + M-A34 (continuous flow / predictive-stopping bound) + the goal
+# taxonomy. Two engines run over it:
+#   - okf_abox.py  : HermiT consistency of the symbolic individuals vs the TBox
+#                    (vocabulary adequacy + the physical/abstract, world/belief,
+#                     fluent/event cuts).
+#   - okf_pour_eval.py : the interval-logic success predicate, computed over the
+#                    numeric `pour_params` — the temporal/quantifier reasoning
+#                    HermiT cannot do — returning SUCCESS/FAIL per episode.
+#
+# The pour problem P_pour: transfer >= TGT ml into the mug (achievement), spill
+# nothing = no substance_escape (prevention), keep the spout aligned (maintenance).
+
+classes:
+  Substance: null            # the poured liquid (a substance component)
+
+individuals:
+  # --- Physical ---
+  robot: [RobotBody]
+  bottle: [PhysicalObject]           # the source container
+  mug: [PhysicalObject]              # the receiver
+  milk: [Substance]                  # the poured substance
+
+  # --- Abstract: the problem and its goals ---
+  P_pour: [ManipulationProblem]
+  ph_flow: [Phase]
+  g_transfer: [AchievementGoal]      # received >= TGT by end
+  g_nospill: [PreventionGoal]        # no substance_escape during the pour
+  g_aligned: [MaintenanceGoal]       # spout over mug throughout the flow
+
+  # --- Fluent types (holds over intervals) ---
+  aligned: [FluentType]              # spout aligned over the mug mouth
+  received_ge_target: [FluentType]   # mug holds >= TGT
+  over_capacity: [FluentType]        # mug level > CAP (the escape trigger)
+
+  # --- Event types (occurs over intervals) ---
+  et_tip: [EventType]
+  et_flow: [EventType]
+  et_stop_flow: [EventType]
+  et_substance_escape: [EventType]
+
+  # --- Intervals ---
+  I_tip: [TimeInterval]
+  I_flow: [TimeInterval]
+  I_stop: [TimeInterval]
+
+  # --- Episode E_pour_ok: stop commanded in time (the successful pour) ---
+  E_pour_ok: [ManipulationEpisode]
+  ok_tip: [WorldOccurrence]
+  ok_flow: [WorldOccurrence]
+  ok_stop: [WorldOccurrence]
+
+  # --- Episode E_pour_over: stop commanded too late (overflow / spill) ---
+  E_pour_over: [ManipulationEpisode]
+  ov_tip: [WorldOccurrence]
+  ov_flow: [WorldOccurrence]
+  ov_stop: [WorldOccurrence]
+  ov_escape: [WorldOccurrence]       # substance_escape occurs — prevention violated
+
+  # --- Episode E_pour_edge: stop just past the bound (4.6s > 4.5s) — sharp overflow ---
+  E_pour_edge: [ManipulationEpisode]
+  ed_flow: [WorldOccurrence]
+  ed_stop: [WorldOccurrence]
+  ed_escape: [WorldOccurrence]       # overflows by 5 ml — the bound is sharp
+
+relations:
+  - [P_pour, hasPhase, ph_flow]
+  - [P_pour, hasGoal, g_transfer]
+  - [P_pour, hasGoal, g_nospill]
+  - [P_pour, hasGoal, g_aligned]
+  - [g_transfer, goalFluent, received_ge_target]
+  - [g_aligned, goalFluent, aligned]
+  - [g_nospill, forbidsEvent, et_substance_escape]
+  # good pour: tip -> flow -> stop, no escape
+  - [E_pour_ok, addresses, P_pour]
+  - [E_pour_ok, hasOccurrence, ok_tip]
+  - [E_pour_ok, hasOccurrence, ok_flow]
+  - [E_pour_ok, hasOccurrence, ok_stop]
+  - [ok_tip, ofEventType, et_tip]
+  - [ok_flow, ofEventType, et_flow]
+  - [ok_stop, ofEventType, et_stop_flow]
+  - [ok_flow, overInterval, I_flow]
+  - [aligned, holdsOver, I_flow]
+  - [I_tip, meets, I_flow]
+  # overflow pour: tip -> flow -> (escape) -> stop-too-late
+  - [E_pour_over, addresses, P_pour]
+  - [E_pour_over, hasOccurrence, ov_tip]
+  - [E_pour_over, hasOccurrence, ov_flow]
+  - [E_pour_over, hasOccurrence, ov_escape]
+  - [E_pour_over, hasOccurrence, ov_stop]
+  - [ov_flow, ofEventType, et_flow]
+  - [ov_escape, ofEventType, et_substance_escape]
+  - [ov_stop, ofEventType, et_stop_flow]
+  # edge pour: overflows just past the bound
+  - [E_pour_edge, addresses, P_pour]
+  - [E_pour_edge, hasOccurrence, ed_flow]
+  - [E_pour_edge, hasOccurrence, ed_escape]
+  - [E_pour_edge, hasOccurrence, ed_stop]
+  - [ed_flow, ofEventType, et_flow]
+  - [ed_escape, ofEventType, et_substance_escape]
+  - [ed_stop, ofEventType, et_stop_flow]
+
+# ---- numeric parameters for okf_pour_eval.py (the interval-logic evaluator) ----
+# All volumes in ml, times in s. TGT <= CAP. lambda = observe+decide+realize+stop latency.
+pour_params:
+  target: 200        # TGT : ml we must transfer
+  capacity: 250      # CAP : mug capacity (escape if level > CAP)
+  rate: 50           # rho : inflow ml/s during flow
+  latency: 0.5       # lambda : s from commanded stop to actual cease
+  episodes:
+    E_pour_ok:   { t_start: 0.0, t_stop_cmd: 4.0 }   # commanded stop at 4.0s
+    E_pour_over: { t_start: 0.0, t_stop_cmd: 6.0 }   # commanded far too late
+    E_pour_edge: { t_start: 0.0, t_stop_cmd: 4.6 }   # just past the bound

@@ -1,0 +1,131 @@
+# Worked-example ABox — "Pour the Beer into the Glass" (foam head)
+# Source: L0-raw-material/notes/2026-07-15-pour-beer-glass-model.md
+# L1:     L1-okf-knowledge-base/bundle/concepts/worked-example-pour-beer-glass.md
+#
+# The pour whose foam head adds to the effective level and then settles. Escape
+# is triggered by liquid + foam, and the solving episode is a two-phase
+# pour-settle-top-up. HermiT-checked by okf_abox.py (consistency + the cuts). An
+# illustrative fragment, not a closed world.
+
+classes:
+  Substance: null
+
+individuals:
+  # --- Physical ---
+  robot: [RobotBody]
+  bottle: [PhysicalObject]
+  glass: [PhysicalObject]
+  beer_liquid: [Substance]           # the settled phase
+  beer_foam: [Substance]             # the transient head
+
+  # --- Abstract: problem and goals ---
+  P_pour_beer: [ManipulationProblem]
+  ph_flow1: [Phase]                  # first pour
+  ph_settle: [Phase]                 # dynamics-relative boundary: foam decays
+  ph_flow2: [Phase]                  # top-up
+  g_fill: [AchievementGoal]          # settled liquid >= TGT
+  g_nooverflow: [PreventionGoal]     # no substance_escape (liquid + foam > CAP)
+  g_aligned: [MaintenanceGoal]
+
+  # --- Fluent types ---
+  liquid_ge_target: [FluentType]     # settled liquid >= TGT
+  foam_present: [FluentType]         # foam > 0 (holds over the settle window, then ceases)
+  effective_over_rim: [FluentType]   # liquid + foam > CAP (the escape trigger)
+  aligned: [FluentType]
+
+  # --- Event types ---
+  et_flow: [EventType]
+  et_foam_rise: [EventType]          # foam forms during flow
+  et_foam_settle: [EventType]        # foam decays (cease of foam_present)
+  et_stop_flow: [EventType]
+  et_substance_escape: [EventType]
+
+  # --- Intervals ---
+  I_f1: [TimeInterval]
+  I_settle: [TimeInterval]
+  I_f2: [TimeInterval]
+
+  # --- Episode E_beer_ok: pour, wait for foam to settle, top up (two-phase) ---
+  E_beer_ok: [ManipulationEpisode]
+  ok_flow1: [WorldOccurrence]
+  ok_foam: [WorldOccurrence]
+  ok_settle: [WorldOccurrence]
+  ok_flow2: [WorldOccurrence]
+  ok_stop: [WorldOccurrence]
+
+  # --- Episode E_beer_over: poured straight through — foam crests the rim ---
+  E_beer_over: [ManipulationEpisode]
+  ov_flow: [WorldOccurrence]
+  ov_foam: [WorldOccurrence]
+  ov_escape: [WorldOccurrence]       # liquid + foam > CAP: foam-driven overflow
+
+  # --- Envisioning layer (Kunze & Beetz 2015): the foam trajectory is PROJECTED ---
+  sdt: [SemanticDigitalTwin]         # the projector
+  sim: [RobotSimulator]              # the physics engine
+  scenario_beer: [Scenario]          # body-world scenario for the pour
+  pspace: [ParameterSpace]           # pour rate / tilt / height ranges
+  param_ok: [ParameterSample]        # the parameter draw that solves
+  envision_ok: [Envisioning]         # simulate + translate for param_ok
+  simlog_ok: [SimulationLog]         # the raw per-step log
+  tl_ok: [EnvisionedTimeline]        # translated timeline; projects E_beer_ok
+  envision_ov: [Envisioning]         # a draw that overflows
+  simlog_ov: [SimulationLog]
+  tl_ov: [EnvisionedTimeline]        # projects E_beer_over (overflow read off the sim)
+
+relations:
+  - [robot, hasPart, bottle]
+  - [P_pour_beer, hasPhase, ph_flow1]
+  - [P_pour_beer, hasPhase, ph_settle]
+  - [P_pour_beer, hasPhase, ph_flow2]
+  - [P_pour_beer, hasGoal, g_fill]
+  - [P_pour_beer, hasGoal, g_nooverflow]
+  - [P_pour_beer, hasGoal, g_aligned]
+  - [g_fill, goalFluent, liquid_ge_target]
+  - [g_aligned, goalFluent, aligned]
+  - [g_nooverflow, forbidsEvent, et_substance_escape]
+  # good pour: flow1 -> foam rises -> settle -> flow2 (top-up) -> stop; no escape
+  - [E_beer_ok, addresses, P_pour_beer]
+  - [E_beer_ok, hasOccurrence, ok_flow1]
+  - [E_beer_ok, hasOccurrence, ok_foam]
+  - [E_beer_ok, hasOccurrence, ok_settle]
+  - [E_beer_ok, hasOccurrence, ok_flow2]
+  - [E_beer_ok, hasOccurrence, ok_stop]
+  - [ok_flow1, ofEventType, et_flow]
+  - [ok_foam, ofEventType, et_foam_rise]
+  - [ok_settle, ofEventType, et_foam_settle]
+  - [ok_flow2, ofEventType, et_flow]
+  - [ok_stop, ofEventType, et_stop_flow]
+  - [ok_flow1, overInterval, I_f1]
+  - [ok_settle, overInterval, I_settle]
+  - [ok_flow2, overInterval, I_f2]
+  - [foam_present, holdsOver, I_settle]
+  - [aligned, holdsOver, I_f1]
+  - [liquid_ge_target, holdsOver, I_f2]
+  - [I_f1, meets, I_settle]
+  - [I_settle, meets, I_f2]
+  # foam-driven overflow: single straight pour crests the rim
+  - [E_beer_over, addresses, P_pour_beer]
+  - [E_beer_over, hasOccurrence, ov_flow]
+  - [E_beer_over, hasOccurrence, ov_foam]
+  - [E_beer_over, hasOccurrence, ov_escape]
+  - [ov_flow, ofEventType, et_flow]
+  - [ov_foam, ofEventType, et_foam_rise]
+  - [ov_escape, ofEventType, et_substance_escape]
+  # envisioning: each episode branch is a PROJECTED timeline, not an execution
+  - [envision_ok, envisionedBy, sdt]
+  - [envision_ok, composesSimulate, sim]
+  - [envision_ok, overParameterSpace, pspace]
+  - [param_ok, drawnFrom, pspace]
+  - [tl_ok, producedByEnvisioning, envision_ok]
+  - [tl_ok, translatedFrom, simlog_ok]
+  - [tl_ok, relativeToScenario, scenario_beer]
+  - [tl_ok, projectionOfBranch, E_beer_ok]       # tl_ok projects the solving branch
+  - [tl_ok, groundsPredicate, foam_present]      # foam level read off the projection
+  - [tl_ok, groundsPredicate, liquid_ge_target]
+  - [scenario_beer, isAbout, glass]
+  # the overflow branch is likewise projected (undesired effect seen in envisioning)
+  - [envision_ov, envisionedBy, sdt]
+  - [tl_ov, producedByEnvisioning, envision_ov]
+  - [tl_ov, translatedFrom, simlog_ov]
+  - [tl_ov, projectionOfBranch, E_beer_over]
+  - [tl_ov, groundsPredicate, effective_over_rim]

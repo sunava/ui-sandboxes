@@ -1,0 +1,141 @@
+# Worked-example ABox — "Fetch the Milk"
+# Source: L0-raw-material/papers/foundation-milk-example.pdf
+#         L0-raw-material/notes/2026-07-05-foundation-milk-example-source.md
+# L1:     L1-okf-knowledge-base/bundle/concepts/worked-example-fetch-milk.md
+#
+# A single manipulation task instantiated on top of the reified foundation and
+# expressed in the interval temporal logic (McDermott 1982): occurrences and
+# holdings over time intervals along one chronicle. Loaded onto the exported L2
+# TBox and checked by HermiT (okf_abox.py). It is an *illustrative fragment*, not
+# a closed world. The physical/abstract cut, the world/belief split
+# (WorldOccurrence vs BeliefOccurrence), and the reified-sort disjointness
+# (FluentType vs EventType vs TimeInterval vs Occurrence) are enforced on these
+# individuals — the referent is not its carton, the believed slip is not the
+# world slip, a fluent is not an event.
+
+# Foundation ABox primitives not carried as TBox classes. (Occurrence,
+# WorldOccurrence, BeliefOccurrence, TimeInterval, EventType, FluentType are now
+# TBox classes from the interval-temporal-logic module.)
+classes:
+  Grounding: Abstract        # a reified (ternary) groundsTo binding — a description
+  Requester: null            # the agent who issued the request (role, unplaced)
+
+individuals:
+  # --- Physical: the body and the objects (reference ambiguity is real) ---
+  robot: [RobotBody]
+  gripper: [PhysicalObject]
+  carton_1: [PhysicalObject]
+  carton_2: [PhysicalObject]
+  carton_3: [PhysicalObject]
+  shelf: [PhysicalObject]
+  table: [PhysicalObject]
+  ws_0: [WorldState]                 # the initial physical world-state
+
+  # --- Abstract: executive, the minted referent, its observation ---
+  me: [ManipulationExecutive]
+  requester: [Requester]
+  the_milk_to_deliver: [ActionReferent]   # minted by the ME; NOT the carton
+  obs_1: [Observation]                     # a partial projection of ws_0 (Observation ⊑ ¬WorldState)
+  grounding_1: [Grounding]                 # groundsTo(the_milk_to_deliver, carton_2, obs_1)
+
+  # --- The problem P_fetch_milk (Abstract) ---
+  P_fetch_milk: [ManipulationProblem]
+  ph_reach: [Phase]
+  ph_transport: [Phase]
+  ph_carry: [Phase]
+  g_deliver: [AchievementGoal]       # RightClosed, goalType=milk_reachable
+  g_grasp: [MaintenanceGoal]         # goalType=grasp_stable  (restorable — see §7)
+  g_upright: [MaintenanceGoal]       # goalType=carton_upright
+  g_nocollide: [PreventionGoal]      # RightOpen, goalType=collision (terminal contact bracket-exempt)
+  g_nodrop: [PreventionGoal]         # goalType=drop
+
+  # --- Fluent types the goals track (holds over intervals; homogeneous) ---
+  grasp_stable: [FluentType]
+  carton_upright: [FluentType]
+  milk_reachable: [FluentType]
+
+  # --- Event types (occurs over intervals; non-homogeneous) ---
+  et_resolve: [EventType]
+  et_make_contact: [EventType]
+  et_grasp_established: [EventType]
+  et_slip: [EventType]
+  et_place: [EventType]
+
+  # --- Time intervals (convex, bracketed stretches; second arg of holds/occurs) ---
+  I_mk: [TimeInterval]
+  I_gr: [TimeInterval]
+  I_sl: [TimeInterval]
+  I_lo: [TimeInterval]
+  I_rg: [TimeInterval]
+  I_pl: [TimeInterval]
+
+  # --- The projected episode E_milk_1 (slip and repair) ---
+  E_milk_1: [ManipulationEpisode]    # admissible_model(E_milk_1, me): a projection, not an execution
+  o_resolve: [WorldOccurrence]       # resolve_reference: referent -> carton_2
+  o_reach: [WorldOccurrence]
+  o_make: [WorldOccurrence]          # make_contact(gripper, carton_2)
+  o_grasp: [WorldOccurrence]         # grasp_established
+  o_slip: [WorldOccurrence]          # the world test-lift slip
+  o_slip_B: [BeliefOccurrence]       # the ME registers the slip after Δt_obs
+  o_lower: [WorldOccurrence]         # restore_support
+  o_regrasp: [WorldOccurrence]       # the repair
+  o_place: [WorldOccurrence]         # place_contact(carton_2, table)
+  o_release: [WorldOccurrence]       # break_contact
+
+relations:
+  # embodiment
+  - [robot, hasPart, gripper]
+  # the observation-relative grounding (reified ternary groundsTo)
+  - [grounding_1, groundingReferent, the_milk_to_deliver]
+  - [grounding_1, groundingObject, carton_2]
+  - [grounding_1, groundingObservation, obs_1]
+  - [obs_1, projectionOf, ws_0]
+  # the problem: phases and goals
+  - [P_fetch_milk, hasPhase, ph_reach]
+  - [P_fetch_milk, hasPhase, ph_transport]
+  - [P_fetch_milk, hasPhase, ph_carry]
+  - [P_fetch_milk, hasGoal, g_deliver]
+  - [P_fetch_milk, hasGoal, g_grasp]
+  - [P_fetch_milk, hasGoal, g_upright]
+  - [P_fetch_milk, hasGoal, g_nocollide]
+  - [P_fetch_milk, hasGoal, g_nodrop]
+  # goals track fluent types
+  - [g_deliver, goalFluent, milk_reachable]
+  - [g_grasp, goalFluent, grasp_stable]
+  - [g_upright, goalFluent, carton_upright]
+  # the episode addresses the problem and is built of occurrences
+  - [E_milk_1, addresses, P_fetch_milk]
+  - [E_milk_1, generatedByExecutive, me]
+  - [E_milk_1, hasOccurrence, o_resolve]
+  - [E_milk_1, hasOccurrence, o_reach]
+  - [E_milk_1, hasOccurrence, o_make]
+  - [E_milk_1, hasOccurrence, o_grasp]
+  - [E_milk_1, hasOccurrence, o_slip]
+  - [E_milk_1, hasOccurrence, o_lower]
+  - [E_milk_1, hasOccurrence, o_regrasp]
+  - [E_milk_1, hasOccurrence, o_place]
+  - [E_milk_1, hasOccurrence, o_release]
+  - [E_milk_1, hasBeliefOccurrence, o_slip_B]
+  # occurs(η, i): each occurrence is an event type over an interval
+  - [o_resolve, ofEventType, et_resolve]
+  - [o_make, ofEventType, et_make_contact]
+  - [o_grasp, ofEventType, et_grasp_established]
+  - [o_slip, ofEventType, et_slip]
+  - [o_place, ofEventType, et_place]
+  - [o_make, overInterval, I_mk]
+  - [o_grasp, overInterval, I_gr]
+  - [o_slip, overInterval, I_sl]
+  - [o_lower, overInterval, I_lo]
+  - [o_regrasp, overInterval, I_rg]
+  - [o_place, overInterval, I_pl]
+  # holds(φ, i): grasp_stable holds throughout the pre-slip grasp interval
+  # (it lapses over I_sl — a negation, not asserted here — then re-holds after the regrasp)
+  - [grasp_stable, holdsOver, I_gr]
+  # interval relations: the temporal skeleton (meets / before)
+  - [I_mk, meets, I_gr]
+  - [I_gr, before, I_sl]
+  - [I_sl, meets, I_lo]
+  - [I_lo, meets, I_rg]
+  - [I_rg, before, I_pl]
+  # the world slip is registered as a belief occurrence (renders across the split)
+  - [o_slip, renders, o_slip_B]

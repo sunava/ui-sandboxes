@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AICOR · The Lab Robot (Tracy)</title>
+<link rel="stylesheet" href="static/app.css" />
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">◧◧</div>
+    <div class="brand-text">
+      <h1>AICOR System · The Lab Robot</h1>
+      <p>Tracy — reasoning over the real AICOR&nbsp;L2 knowledge base</p>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <a class="ext" href="https://vib.ai.uni-bremen.de/page/comingsoon/the-tracebot-laboratory/" target="_blank" rel="noopener">TraceBot @ IAI Bremen ↗</a>
+  </div>
+</header>
+
+<main class="split">
+  <!-- ============================ LEFT : ROBOT ============================ -->
+  <section class="panel panel-left">
+    <div class="panel-head">
+      <h2>Tracy · the lab robot</h2>
+      <div class="view-toggle">
+        <button data-view="3d" class="active">3D model</button>
+        <button data-view="photo">Real robot</button>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div id="stage-bg" class="stage-bg"></div>
+      <div id="viewer"></div>
+      <img id="photo" class="hidden" src="static/img/tracy_robot_with_objects.jpg" alt="Tracy robot" />
+      <div id="viewer-status" class="viewer-status">Loading Tracy…</div>
+
+      <div id="layers-panel" class="layers-panel">
+        <div class="lp-title">Layers</div>
+        <label class="lp-row"><input type="checkbox" id="lyr-objects" checked><span>Bench objects</span></label>
+        <label class="lp-row"><input type="checkbox" id="lyr-labels"><span>Object labels</span></label>
+        <label class="lp-row"><input type="checkbox" id="lyr-floor" checked><span>Floor shadow</span></label>
+        <label class="lp-row"><input type="checkbox" id="lyr-rotate"><span>Auto-rotate</span></label>
+        <div class="lp-legend" id="lp-legend"></div>
+      </div>
+
+      <div id="step-caption" class="step-caption hidden"></div>
+      <div class="stage-hint">drag orbit · scroll zoom · right-drag pan</div>
+    </div>
+
+    <div class="workflow">
+      <div class="workflow-head">
+        <span>Worked examples · <em>ABoxes from the AICOR ontology</em></span>
+        <button id="play-btn" class="play-btn cram" title="Play the recorded pycram + giskardpy motion trajectory">▶ Play robot motion</button>
+      </div>
+      <div id="workflow-strip" class="workflow-strip"><!-- filled by JS --></div>
+    </div>
+  </section>
+
+  <!-- ========================= RIGHT : KNOWLEDGE ========================= -->
+  <section class="panel panel-right">
+    <div class="panel-head">
+      <h2>AICOR&nbsp;L2 ontology &amp; reasoning</h2>
+      <span id="kb-status" class="kb-status">loading ontology…</span>
+    </div>
+
+    <div class="query-box">
+      <div class="query-row">
+        <input id="query-input" type="text" spellcheck="false"
+               placeholder="Ask the ontology:  superclasses('AchievementGoal', L)." />
+        <button id="query-run">Run</button>
+      </div>
+      <div id="presets" class="presets"><!-- filled by JS --></div>
+    </div>
+
+    <div id="answer" class="answer">
+      <div class="answer-empty">Loading the real AICOR&nbsp;L2 knowledge base…</div>
+    </div>
+
+    <div class="graph-wrap">
+      <div id="graph"></div>
+      <div class="legend" id="legend"></div>
+      <div id="graph-modes" class="graph-modes">
+        <div class="gm-title">Edges</div>
+        <label class="gm-row"><input type="checkbox" id="mode-isa" checked disabled><i class="gm-edge" style="--ec:#39d5c8"></i><span>is-a <small>(hierarchy)</small></span></label>
+        <label class="gm-row"><input type="checkbox" id="mode-rel"><i class="gm-edge" style="--ec:#b98cff"></i><span>Relationships <small>(object properties)</small></span></label>
+        <label class="gm-row"><input type="checkbox" id="mode-restr"><i class="gm-edge dashed" style="--ec:#ffb648"></i><span>Restrictions <small>(cardinality)</small></span></label>
+        <label class="gm-row"><input type="checkbox" id="mode-disj"><i class="gm-edge dashed" style="--ec:#ff6b8b"></i><span>Disjointness <small>(incompatible)</small></span></label>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- vendored libraries (all local, no CDN at runtime) -->
+<script src="vendor/three.min.js"></script>
+<script src="vendor/RoomEnvironment.js"></script>
+<script src="vendor/RGBELoader.js"></script>
+<script src="vendor/STLLoader.js"></script>
+<script src="vendor/ColladaLoader.js"></script>
+<script src="vendor/OrbitControls.js"></script>
+<script src="vendor/URDFLoader.js"></script>
+<script src="vendor/vis-network.min.js"></script>
+<script src="vendor/tau-prolog.js"></script>
+<script src="vendor/tau-lists.js"></script>
+<!-- app -->
+<script src="static/kb.js"></script>
+<script src="static/robot.js"></script>
+<script src="static/graph.js"></script>
+<script src="static/main.js"></script>
+<script src="static/split-resize.js"></script>
+</body>
+</html>

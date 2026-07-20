@@ -1,0 +1,124 @@
+# Worked-example ABox — "Grasp the Egg to Crack It into a Pan" (goal inversion)
+# Source: L0-raw-material/notes/2026-07-15-egg-crack-model.md
+#         L0-raw-material/notes/2026-07-15-morgenstern-egg-cracking-source.md
+# L1:     L1-okf-knowledge-base/bundle/concepts/worked-example-egg-crack.md
+#
+# DEEPENED from Morgenstern (2001): the single shell_rupture event is refined into
+# the crack-then-open-up two-phase structure. A crack (CrackEvent) initiates a
+# CrackedContainerState that is STILL closed (a pre-opening); a separate OpenUp
+# (OpenUpEvent) initiates the OpenContainerState, and only then do the contents
+# reach the pan — and only if the crack faces up. Typed against the new
+# cracked-container-state DL classes and HermiT-checked by okf_abox.py.
+
+classes:
+  Substance: null
+
+individuals:
+  # --- Physical ---
+  robot: [RobotBody]
+  gripper: [EndEffector]
+  egg: [PhysicalObject]
+  pan: [PhysicalObject]
+  yolk: [Substance]                    # the contents to deliver
+  shell: [PhysicalObject]
+  egg_tip: [PhysicalObject]            # the protruding part of the egg (target part)
+  bowl_rim: [PhysicalObject]           # the sharp rim of the bowl (tool part)
+
+  # --- Abstract: schema, contact pair, problem ---
+  fds_egg: [ForceDynamicSchema]
+  cpair: [ContactPair]                 # (egg_tip, bowl_rim) fixes the crackforce band
+  P_egg_crack: [ManipulationProblem]
+  ph_transport: [Phase]                # closed + intact holds here
+  ph_crack: [Phase]                    # crack fires here -> cracked (still closed)
+  ph_openup: [Phase]                   # open-up fires here -> open
+  ph_deliver: [Phase]
+  g_intact_pre: [PreventionGoal]       # no crack DURING transport
+  g_fracture: [AchievementGoal]        # a controlled crack OCCURS at the site
+  g_openup: [AchievementGoal]          # an up-crack open-up OCCURS over the pan
+  g_clean: [PreventionGoal]            # no yolk_rupture, no shell_in_pan, no shatter
+  g_contain: [MaintenanceGoal]         # contents directed into the pan
+
+  # --- Closure-state fluent types (the pre-opening refinement) ---
+  cc_closed: [ClosedContainerState]    # egg is a closed container
+  cc_cracked: [CrackedContainerState]  # cracked but STILL closed (pre-opening)
+  cc_open: [OpenContainerState]        # opened; contents can leave
+  orient_up: [CrackOrientation]        # the crack faces up over the pan
+
+  # --- Event types ---
+  et_transport: [EventType]
+  et_crack: [CrackEvent]               # Hit(egg_tip, bowl_rim, crackforce)
+  et_openup: [OpenUpEvent]             # enlarge the crack into an opening
+  et_shatter: [EventType]             # over-force fragmentation (forbidden)
+  et_yolk_rupture: [EventType]         # scatter (forbidden)
+  et_deliver: [EventType]
+
+  # --- Intervals ---
+  I_transport: [TimeInterval]
+  I_crack: [TimeInterval]
+  I_cracked: [TimeInterval]            # the pre-opening holds here (still closed)
+  I_openup: [TimeInterval]
+  I_deliver: [TimeInterval]
+
+  # --- Episode E_egg_crack: transport -> crack(pre-opening) -> open-up -> deliver ---
+  E_egg_crack: [ManipulationEpisode]
+  o_transport: [WorldOccurrence]
+  o_crack: [WorldOccurrence]           # the target crack (achievement, pre-opening)
+  o_openup: [WorldOccurrence]          # the open-up (irreversible)
+  o_deliver: [WorldOccurrence]
+
+relations:
+  - [robot, hasPart, gripper]
+  - [egg, hasPart, shell]
+  - [egg, hasPart, egg_tip]
+  - [cpair, targetPart, egg_tip]
+  - [cpair, toolPart, bowl_rim]
+  - [P_egg_crack, governedBy, fds_egg]
+  - [P_egg_crack, hasPhase, ph_transport]
+  - [P_egg_crack, hasPhase, ph_crack]
+  - [P_egg_crack, hasPhase, ph_openup]
+  - [P_egg_crack, hasPhase, ph_deliver]
+  - [P_egg_crack, hasGoal, g_intact_pre]
+  - [P_egg_crack, hasGoal, g_fracture]
+  - [P_egg_crack, hasGoal, g_openup]
+  - [P_egg_crack, hasGoal, g_clean]
+  - [P_egg_crack, hasGoal, g_contain]
+  # the inversion: g_intact_pre FORBIDS the crack that g_fracture REQUIRES
+  - [g_intact_pre, forbidsEvent, et_crack]
+  - [g_fracture, achievesEvent, et_crack]
+  - [g_openup, achievesEvent, et_openup]
+  - [g_clean, forbidsEvent, et_shatter]
+  - [g_clean, forbidsEvent, et_yolk_rupture]
+  - [g_contain, goalFluent, cc_open]
+  - [g_intact_pre, inPhase, ph_transport]
+  - [g_fracture, inPhase, ph_crack]
+  - [g_openup, inPhase, ph_openup]
+  # the crack/open-up state machine (Morgenstern Ax 48-52)
+  - [et_crack, atContactPair, cpair]
+  - [et_crack, initiatesStateType, cc_cracked]
+  - [et_openup, actsOnState, cc_cracked]
+  - [et_openup, initiatesStateType, cc_open]
+  - [cc_cracked, initiatedByEvent, et_crack]
+  - [cc_cracked, resolvesToState, cc_open]
+  - [cc_cracked, hasCrackOrientation, orient_up]
+  # the episode
+  - [E_egg_crack, addresses, P_egg_crack]
+  - [E_egg_crack, hasOccurrence, o_transport]
+  - [E_egg_crack, hasOccurrence, o_crack]
+  - [E_egg_crack, hasOccurrence, o_openup]
+  - [E_egg_crack, hasOccurrence, o_deliver]
+  - [o_transport, ofEventType, et_transport]
+  - [o_crack, ofEventType, et_crack]
+  - [o_openup, ofEventType, et_openup]
+  - [o_deliver, ofEventType, et_deliver]
+  - [o_transport, overInterval, I_transport]
+  - [o_crack, overInterval, I_crack]
+  - [o_openup, overInterval, I_openup]
+  - [o_deliver, overInterval, I_deliver]
+  # closed throughout transport AND the cracked (pre-opening) interval; open only after open-up
+  - [cc_closed, holdsOver, I_transport]
+  - [cc_cracked, holdsOver, I_cracked]   # cracked-but-closed: the pre-opening
+  - [cc_open, holdsOver, I_deliver]
+  - [I_transport, meets, I_crack]
+  - [I_crack, meets, I_cracked]
+  - [I_cracked, meets, I_openup]
+  - [I_openup, meets, I_deliver]

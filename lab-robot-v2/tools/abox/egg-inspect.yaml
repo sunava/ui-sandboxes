@@ -1,0 +1,99 @@
+# Worked-example ABox — "Grasp the Egg to Inspect It" (perception-coverage coupling)
+# Source: L0-raw-material/notes/2026-07-15-egg-inspect-model.md
+# L1:     L1-okf-knowledge-base/bundle/concepts/worked-example-egg-inspect.md
+#
+# The same egg fragility schema with a perception-coverage achievement:
+# observed(region_i) is an OBSERVER (belief) fluent, satisfied by reorientation,
+# coupled to a concurrent fragile-grasp maintenance/prevention that must hold
+# across the whole plan. HermiT-checked by okf_abox.py; note observed_* fluents
+# are belief-side (world/belief cut). Illustrative fragment.
+
+classes:
+  Substance: null
+
+individuals:
+  # --- Physical ---
+  robot: [RobotBody]
+  gripper: [EndEffector]
+  egg: [PhysicalObject]
+  cam: [Sensor]
+
+  # --- Abstract: schema, problem, belief-state twin ---
+  fds_egg: [ForceDynamicSchema]
+  sdt: [SemanticDigitalTwin]           # coverage condition lives on its info state
+  P_egg_inspect: [ManipulationProblem]
+  ph_inspect: [Phase]
+  g_grasp: [MaintenanceGoal]           # grasp_stable (restorable), force at the floor
+  g_intact: [PreventionGoal]           # no shell_rupture (irreversible)
+  g_coverage: [AchievementGoal]        # every region observed (an observer fluent)
+
+  # --- Fluent types ---
+  grasp_stable: [FluentType]
+  # observer (belief) fluents: a region has been in the sensor frustum
+  observed_r1: [FluentType]
+  observed_r2: [FluentType]
+  observed_r3: [FluentType]
+  full_coverage: [FluentType]          # union of observed regions covers the surface
+
+  # --- Event types ---
+  et_contact: [EventType]
+  et_reorient: [EventType]             # a reorientation presenting a region
+  et_observe: [EventType]
+
+  # --- Intervals ---
+  I_r1: [TimeInterval]
+  I_r2: [TimeInterval]
+  I_r3: [TimeInterval]
+  I_hold: [TimeInterval]               # grasp held across the whole plan
+
+  # --- Episode E_egg_inspect: three reorientations achieve full coverage, intact ---
+  E_egg_inspect: [ManipulationEpisode]
+  o_contact: [WorldOccurrence]
+  o_reorient1: [WorldOccurrence]
+  o_reorient2: [WorldOccurrence]
+  o_reorient3: [WorldOccurrence]
+  o_obs1_B: [BeliefOccurrence]         # observing is a belief-side occurrence
+  o_obs2_B: [BeliefOccurrence]
+  o_obs3_B: [BeliefOccurrence]
+
+relations:
+  - [robot, hasPart, gripper]
+  - [robot, hasSensor, cam]
+  - [P_egg_inspect, governedBy, fds_egg]
+  - [P_egg_inspect, hasPhase, ph_inspect]
+  - [P_egg_inspect, hasGoal, g_grasp]
+  - [P_egg_inspect, hasGoal, g_intact]
+  - [P_egg_inspect, hasGoal, g_coverage]
+  - [g_grasp, goalFluent, grasp_stable]
+  - [g_coverage, goalFluent, full_coverage]
+  - [g_coverage, coversRegionFluent, observed_r1]
+  - [g_coverage, coversRegionFluent, observed_r2]
+  - [g_coverage, coversRegionFluent, observed_r3]
+  - [g_coverage, resolvedAgainst, sdt]
+  # the episode: grasp held throughout, three reorientations, each observes a region
+  - [E_egg_inspect, addresses, P_egg_inspect]
+  - [E_egg_inspect, hasOccurrence, o_contact]
+  - [E_egg_inspect, hasOccurrence, o_reorient1]
+  - [E_egg_inspect, hasOccurrence, o_reorient2]
+  - [E_egg_inspect, hasOccurrence, o_reorient3]
+  - [E_egg_inspect, hasBeliefOccurrence, o_obs1_B]
+  - [E_egg_inspect, hasBeliefOccurrence, o_obs2_B]
+  - [E_egg_inspect, hasBeliefOccurrence, o_obs3_B]
+  - [o_contact, ofEventType, et_contact]
+  - [o_reorient1, ofEventType, et_reorient]
+  - [o_reorient2, ofEventType, et_reorient]
+  - [o_reorient3, ofEventType, et_reorient]
+  - [o_reorient1, overInterval, I_r1]
+  - [o_reorient2, overInterval, I_r2]
+  - [o_reorient3, overInterval, I_r3]
+  # coverage accumulates over the plan; grasp_stable holds across the whole hold interval
+  - [grasp_stable, holdsOver, I_hold]
+  - [observed_r1, holdsOver, I_r1]
+  - [observed_r2, holdsOver, I_r2]
+  - [observed_r3, holdsOver, I_r3]
+  - [full_coverage, holdsOver, I_r3]     # after the third region, union is complete
+  - [o_reorient1, renders, o_obs1_B]
+  - [o_reorient2, renders, o_obs2_B]
+  - [o_reorient3, renders, o_obs3_B]
+  - [I_r1, meets, I_r2]
+  - [I_r2, meets, I_r3]
