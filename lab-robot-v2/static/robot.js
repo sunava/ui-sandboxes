@@ -47,10 +47,10 @@
   }
 
   // ---- lighting: warm-neutral to match the real lab photo -------------------
-  scene.add(new THREE.HemisphereLight(0xf4efe6, 0x2a2d33, 0.7));
-  scene.add(new THREE.AmbientLight(0xfff4e6, 0.28));
+  scene.add(new THREE.HemisphereLight(0xf4efe6, 0x2a2d33, 0.42));
+  scene.add(new THREE.AmbientLight(0xfff4e6, 0.12));
 
-  const key = new THREE.DirectionalLight(0xfff2df, 1.2);   // warm key
+  const key = new THREE.DirectionalLight(0xfff2df, 1.45);   // warm key
   key.position.set(3, 5, 2);
   key.castShadow = true;
   key.shadow.mapSize.set(2048, 2048);
@@ -157,11 +157,9 @@
       c.material = wasArray ? up : up[0];
     });
 
-    // dark graphite bench: colour every mesh of the URDF `table` link so the
-    // reagents stand out clearly against it (low metalness/reflections keep it
-    // genuinely dark under the bright studio HDRI)
+    // brushed stainless bench, like the real workcell table in the photo
     const benchMat = new THREE.MeshStandardMaterial({
-      color: 0x23262b, metalness: 0.35, roughness: 0.55, envMapIntensity: 0.3,
+      color: 0x8a9098, metalness: 0.72, roughness: 0.42, envMapIntensity: 0.95,
     });
     const tableLink = robot.links && robot.links.table;
     if (tableLink) {
@@ -465,27 +463,50 @@
     }
   }
 
-  // Give materials a subtle PBR sheen from the environment map WITHOUT changing
-  // their colour. The DAE meshes load with correct colours; we must preserve
-  // them (low metalness so the diffuse colour dominates, never a white mirror).
+  // Map each UR10e / Robotiq DAE material to a physically plausible PBR finish so
+  // the arms read like the real robot: polished aluminium tubes, satin graphite
+  // joint housings, glossy blue caps, matte-black cabling. Keyed on the DAE
+  // material name (LinkGrey / JointGrey / URBlue / Black) with a colour-based
+  // fallback when the loader doesn't carry a usable name.
+  function pbrFinish(nameRaw, color) {
+    const name = (nameRaw || '').toLowerCase();
+    const lum = color ? (0.299 * color.r + 0.587 * color.g + 0.114 * color.b) : 0.5;
+    const bluish = !!color && color.b > color.r + 0.12 && color.b > 0.5;
+    const nearNeutral = !!color && Math.abs(color.r - color.b) < 0.06 && Math.abs(color.r - color.g) < 0.06;
+    // colour drives the decision (name only overrides). CRITICAL: only the arm
+    // tubes are genuinely metallic — plastics keep metalness 0 so their diffuse
+    // colour stays saturated instead of washing out under the bright IBL.
+    // polished aluminium arm tubes
+    if (name.indexOf('link') >= 0 || (nearNeutral && lum > 0.6))
+      return { metalness: 0.9, roughness: 0.33, env: 0.9, tint: 0xb9bec5 };
+    // glossy UR blue caps — punchy plastic blue
+    if (name.indexOf('blue') >= 0 || bluish)
+      return { metalness: 0.0, roughness: 0.28, env: 0.4, tint: 0x3f9bd6 };
+    // matte black plastic / rubber / cable conduit
+    if (name.indexOf('black') >= 0 || lum < 0.1)
+      return { metalness: 0.0, roughness: 0.5, env: 0.28 };
+    // satin graphite joint housings (mid greys) + sensible default — dark plastic
+    return { metalness: 0.0, roughness: 0.46, env: 0.38,
+             tint: (nearNeutral && lum > 0.15 && lum < 0.6) ? 0x3a3d43 : undefined };
+  }
+
   function upgradeMaterial(old) {
-    if (old && old.isMeshStandardMaterial) {     // already PBR → just a light sheen
-      old.envMapIntensity = 0.55;
-      old.roughness = Math.min(old.roughness == null ? 0.6 : old.roughness, 0.85);
-      return old;
-    }
-    const m = new THREE.MeshStandardMaterial();
-    if (old) {
-      if (old.color) m.color.copy(old.color);    // keep the real colour
-      if (old.map) m.map = old.map;              // keep the texture
+    const name = old && old.name ? old.name : '';
+    const f = pbrFinish(name, old && old.color ? old.color : null);
+    const m = (old && old.isMeshStandardMaterial) ? old : new THREE.MeshStandardMaterial();
+    if (old && old !== m) {
+      if (old.color) m.color.copy(old.color);
+      if (old.map) m.map = old.map;
       if (old.emissive) m.emissive.copy(old.emissive);
       if (old.vertexColors) m.vertexColors = old.vertexColors;
       if (old.transparent) { m.transparent = true; m.opacity = old.opacity; }
-      m.name = old.name || '';
+      m.name = name;
     }
-    m.metalness = 0.1;                            // low → colour is preserved
-    m.roughness = 0.6;
-    m.envMapIntensity = 0.55;                     // gentle reflections only
+    if (f.tint !== undefined) m.color.setHex(f.tint);
+    m.metalness = f.metalness;
+    m.roughness = f.roughness;
+    m.envMapIntensity = f.env;
+    m.needsUpdate = true;
     return m;
   }
 
