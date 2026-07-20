@@ -97,13 +97,18 @@
   let highlightT = 0;
   const props = {};   // KB-object-id -> { group, mats:[], glow, glowTarget }
 
-  // real giskardpy-planned trajectory playback state
-  let traj = null, trajPlaying = false, playhead = 0, held = false, gripperLinkObj = null;
-  const _v = new THREE.Vector3();
-  // steps whose held reagent is poured into the canister (fill / rinse / spike / filter)
-  const POUR_STEPS = { spike_media: 1, filter_transfer: 1, rinse: 1, fill_media: 1 };
-  const POUR_WIN = 30;            // frames before release during which we pour
-  let streamGroup = null, streamMesh = null;
+  // real giskardpy-planned trajectory playback state.
+  // DEMO IS BEING REBUILT STEP BY STEP: for now the robot does nothing — the arm
+  // trajectory is disabled and it just holds its home pose. Flip DEMO_ARM_MOTION
+  // to true to bring the recorded arm playback back.
+  const DEMO_ARM_MOTION = true;
+  let traj = null, trajPlaying = false, playhead = 0, gripperLinkObj = null;
+
+  // ---- grasp follow: while the recorded plan holds an object, the object rides
+  // the gripper with the exact relative pose it had at the grasp instant -------
+  const _v = new THREE.Vector3(), _q = new THREE.Quaternion(), _q2 = new THREE.Quaternion(), _rq = new THREE.Quaternion(), _off = new THREE.Vector3();
+  const graspPos = new THREE.Vector3(), graspRel = new THREE.Quaternion();
+  let heldNow = false;                                     // is the plan currently holding its object?
 
   // a dedicated LoadingManager so we know when every mesh has arrived
   const manager = new THREE.LoadingManager();
@@ -120,9 +125,9 @@
     robot = model;
     robot.rotation.x = -Math.PI / 2;          // URDF Z-up → Three Y-up
 
-    // start at the neutral HOME pose (joints exist right after parse); the
+    // start at the idle HOME pose (joints exist right after parse); the
     // render loop then eases toward whatever step pose is requested
-    setPoseInstant(POSES.prep);
+    setPoseInstant(POSES.home);
 
     scene.add(robot);
     needsRender = true;
@@ -198,7 +203,7 @@
 
     // load the real CRAM/giskardpy trajectory and build the objects at the exact
     // map-frame coordinates the arm reaches for them (so arm and objects align)
-    fetch('static/trajectory.json').then(function (r) { return r.ok ? r.json() : null; })
+    fetch('static/tracy_demo.json').then(function (r) { return r.ok ? r.json() : null; })
       .then(function (d) {
         if (!d) return;
         traj = d;
@@ -209,34 +214,56 @@
       .catch(function () {});
   }
 
-  // ---- real trajectory playback ---------------------------------------------
-  let curSeg = -1, playEnd = 0, heldObj = null, stepStartCb = function () {};
+  // ---- real trajectory playback (arm motion only) ---------------------------
+  // Clean slate: this just plays the recorded joint trajectory. Object grasping,
+  // pouring and placing were removed on purpose so we can rebuild them one step
+  // at a time. The objects on the bench stay static during playback for now.
+  let playEnd = 0, stepStartCb = function () {};
 
   function segByStep(step) { return traj && (traj.segments || []).filter(function (s) { return s.step === step; })[0]; }
 
   function resetProps() {
-    for (const id in props) if (props[id].homePos) props[id].group.position.copy(props[id].homePos);
+    for (const id in props) {
+      if (props[id].homePos) props[id].group.position.copy(props[id].homePos);
+      if (props[id].homeQuat) props[id].group.quaternion.copy(props[id].homeQuat);
+    }
   }
 
-  // play the whole membrane-test trajectory, or just one step's segment
-  function playTrajectory(fromStep) {
+  // start playback right after the arm has parked, so it begins from the idle pose
+  function playStartFrame() { const p = segByStep('park'); return p ? p.end : 0; }
+
+  function playTrajectory() {
     if (!traj || !robot) return false;
-    const seg = fromStep ? segByStep(fromStep) : null;
-    if (fromStep && !seg) return false;
-    trajPlaying = true; held = false; heldObj = null; curSeg = -1;
-    if (seg) { playhead = seg.start; playEnd = seg.end; }
-    else { playhead = 0; playEnd = traj.frames.length - 1; resetProps(); resetCanister(); }
+    trajPlaying = true; heldNow = false;
+    playhead = playStartFrame(); playEnd = traj.frames.length - 1;
+    resetProps();
     return true;
   }
-  function stopTrajectory() {
-    if (!trajPlaying) return;
-    trajPlaying = false; held = false; heldObj = null;
-    highlightObjects([]); hideStream();
+  function stopTrajectory() { trajPlaying = false; heldNow = false; }
+
+  // record the object's pose relative to the gripper at the grasp instant
+  function captureGrasp(objId) {
+    const p = props[objId]; if (!p || !gripperLinkObj) return;
+    gripperLinkObj.getWorldQuaternion(_q);
+    gripperLinkObj.getWorldPosition(_v);
+    p.group.getWorldQuaternion(_q2);
+    p.group.getWorldPosition(_off);
+    _rq.copy(_q).invert();
+    graspPos.copy(_off).sub(_v).applyQuaternion(_rq);      // offset in the gripper frame
+    graspRel.copy(_rq).multiply(_q2);                      // orientation in the gripper frame
   }
-  function currentSegmentIndex() {
-    const segs = traj.segments || [];
-    for (let i = 0; i < segs.length; i++) if (playhead >= segs[i].start && playhead < segs[i].end) return i;
-    return segs.length ? segs.length - 1 : -1;
+  // reproduce that pose each frame → object rides the hand (and tilts with it)
+  function followGrasp(objId) {
+    const p = props[objId]; if (!p || !gripperLinkObj) return;
+    gripperLinkObj.getWorldQuaternion(_q);
+    gripperLinkObj.getWorldPosition(_v);
+    _off.copy(graspPos).applyQuaternion(_q);
+    _v.add(_off);
+    robot.worldToLocal(_v);
+    p.group.position.copy(_v);
+    _q2.copy(_q).multiply(graspRel);
+    robot.getWorldQuaternion(_rq).invert();
+    p.group.quaternion.copy(_rq).multiply(_q2);
   }
   function stepTrajectory() {
     const F = traj.frames;
@@ -244,78 +271,23 @@
     const f0 = F[i0], f1 = F[i1];
     for (const k in f0) { const j = robot.joints[k]; if (j) j.setJointValue(f0[k] + (f1[k] - f0[k]) * a); }
 
-    const si = currentSegmentIndex();
-    if (si !== curSeg) {                          // entered a new workflow step
-      curSeg = si; held = false; heldObj = null;
-      const seg = traj.segments[si];
-      if (seg) stepStartCb(seg.step);
-    }
-    const seg = traj.segments[si];
-    if (seg) {
-      if (!held && seg.attach >= 0 && playhead >= seg.attach) { held = true; heldObj = seg.pick; if (heldObj) highlightObjects([heldObj]); }
-      if (held && seg.detach >= 0 && playhead >= seg.detach) { held = false; dropHeld(heldObj, seg.place); heldObj = null; }
-      if (held && heldObj) followGripper(heldObj);
-      // pour reagents into the canister for fill / rinse / spike / filter steps
-      if (held && heldObj && POUR_STEPS[seg.step] && seg.detach >= 0 && playhead >= seg.detach - POUR_WIN) {
-        doPour(heldObj);
-      } else {
-        hideStream();
-      }
+    const obj = traj.heldObject;
+    if (obj && i0 >= traj.attachFrame && i0 < traj.detachFrame) {
+      if (!heldNow) { captureGrasp(obj); heldNow = true; }
+      followGrasp(obj);
     } else {
-      hideStream();
+      heldNow = false;
     }
 
     playhead += (traj.fps / 60) * 1.8;            // ~1.8× real-time (tick ≈ 60 fps)
-    if (playhead >= playEnd) { trajPlaying = false; stepStartCb('__done__'); }
-  }
-  function followGripper(objId) {
-    if (!gripperLinkObj || !props[objId]) return;
-    // object is a child of the robot root; express the gripper there
-    gripperLinkObj.getWorldPosition(_v); robot.worldToLocal(_v);
-    props[objId].group.position.set(_v.x, _v.y, _v.z - 0.03);
-  }
-  function dropHeld(objId, placeId) {
-    const p = props[objId]; if (!p) return;
-    if (placeId && props[placeId]) {
-      const c = props[placeId].group.position;
-      p.group.position.set(c.x, c.y, c.z + 0.06);   // resting on the canister
-    } else if (p.homePos) {
-      p.group.position.copy(p.homePos);
-    }
-  }
-
-  // set the liquid level inside the canister (0..1)
-  function setCanisterFill(level) {
-    const c = props['sterility_canister']; if (!c || !c.canLiquid) return;
-    const hh = Math.max(0.001, level * c.canH * 0.85);
-    c.canLiquid.scale.y = hh;
-    c.canLiquid.position.y = -c.canH / 2 + hh / 2 + c.canH * 0.06;
-    c.canLiquid.visible = level > 0.01;
-  }
-  // draw a stream from the held bottle down into the canister and fill it a bit
-  function doPour(objId) {
-    const b = props[objId], can = props['sterility_canister'];
-    if (!b || !can || !streamGroup) return;
-    const bp = b.group.position, cp = can.group.position;
-    const topZ = cp.z + can.canH / 2;
-    const botZ = bp.z - (b.h ? b.h / 2 : 0.08);
-    const len = Math.max(0.015, botZ - topZ);
-    streamGroup.position.set(cp.x, cp.y, topZ + len / 2);
-    streamMesh.scale.y = len;
-    const col = (traj && traj.objects && traj.objects[objId] && traj.objects[objId].color) || 0x8fd0e0;
-    streamMesh.material.color.setHex(col);
-    if (can.canLiquid) can.canLiquid.material.color.setHex(col);
-    streamGroup.visible = true;
-    can.fill = Math.min(1, (can.fill || 0) + 0.02);
-    setCanisterFill(can.fill);
-  }
-  function hideStream() { if (streamGroup) streamGroup.visible = false; }
-  function resetCanister() {
-    const c = props['sterility_canister']; if (c) { c.fill = 0; setCanisterFill(0); }
-    hideStream();
+    if (playhead >= playEnd) { trajPlaying = false; heldNow = false; stepStartCb('__done__'); }
   }
 
   // --------------------------------------------------------- bench objects ----
+  // Which bench objects to actually place. Kept minimal for now — expand this
+  // list (ids from trajectory.json → objects) to bring more back into the scene.
+  const DEMO_OBJECTS = ['sterility_canister', 'media_tsb'];
+
   // Build the sterility-test objects from the trajectory's object layout. Each
   // object is a child of the robot ROOT and placed at the SAME map-frame
   // coordinate the arm reaches for it, so the arm actually meets the object.
@@ -323,6 +295,7 @@
   function buildProps(objMeta) {
     if (!robot || !objMeta) return;
     for (const id in objMeta) {
+      if (DEMO_OBJECTS && DEMO_OBJECTS.indexOf(id) < 0) continue;   // start with a minimal scene
       const o = objMeta[id];
       if (o.kind === 'bottle') addBottle(id, o.pos, o.h, o.r, o.color, o.liquid, o.label);
       else if (o.kind === 'canister') addCanister(id, o.pos, o.label);
@@ -330,59 +303,34 @@
     }
     for (const id in props) props[id].homePos = props[id].group.position.clone();
 
-    // a thin liquid stream, reused for every pour (child of robot root, map frame)
-    if (!streamGroup) {
-      streamGroup = new THREE.Group();
-      streamGroup.rotation.x = Math.PI / 2;      // cylinder Y → map z
-      streamMesh = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.006, 0.006, 1, 10),
-        new THREE.MeshStandardMaterial({ color: 0x8fd0e0, transparent: true, opacity: 0.85, emissive: 0x2a6070, emissiveIntensity: 0.5 })
-      );
-      streamGroup.add(streamMesh);
-      streamGroup.visible = false;
-      robot.add(streamGroup);
-    }
-
     function register(id, group, mats, h, pos, label) {
       group.rotation.x = Math.PI / 2;          // stand up along map z
       group.position.set(pos[0], pos[1], pos[2]);
       robot.add(group);
-      props[id] = { group: group, mats: mats, glow: 0, glowTarget: 0, h: h || 0 };
+      props[id] = { group: group, mats: mats, glow: 0, glowTarget: 0, h: h || 0, homeQuat: group.quaternion.clone() };
       addLabel(id, group, h || 0.1, label);
     }
 
     function addBottle(id, pos, h, r, liquidColor, level, label) {
       const g = new THREE.Group();
-      // real glass: physical transmission + refraction (needs scene.environment)
-      const glassMat = new THREE.MeshPhysicalMaterial({
-        color: 0xffffff, metalness: 0, roughness: 0.04,
-        transmission: 1.0, ior: 1.5, thickness: r * 1.6,
-        transparent: true, envMapIntensity: 1.2,
-        clearcoat: 0.4, clearcoatRoughness: 0.08,
+      // opaque, solid container coloured by its contents (not see-through glass)
+      const glassMat = new THREE.MeshStandardMaterial({
+        color: liquidColor, metalness: 0.0, roughness: 0.34, envMapIntensity: 0.55,
       });
       const glass = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 48), glassMat);
-      // OPAQUE liquid — transmission only refracts opaque objects, so a
-      // transparent liquid would vanish behind the glass. Opaque = visible.
-      const liqMat = new THREE.MeshStandardMaterial({
-        color: liquidColor, metalness: 0.0, roughness: 0.25, envMapIntensity: 0.5,
-      });
-      const lh = h * level;
-      const liq = new THREE.Mesh(new THREE.CylinderGeometry(r * 0.9, r * 0.9, lh, 48), liqMat);
-      liq.position.y = -h / 2 + lh / 2;
       const capMat = new THREE.MeshStandardMaterial({ color: 0xf2f5fa, roughness: 0.35, metalness: 0.1, envMapIntensity: 0.8 });
       const cap = new THREE.Mesh(new THREE.CylinderGeometry(r * 0.62, r * 0.62, h * 0.12, 32), capMat);
       cap.position.y = h / 2 + h * 0.05;
-      [glass, liq, cap].forEach(function (m) { m.castShadow = true; g.add(m); });
-      register(id, g, [glassMat, liqMat], h, pos, label);
+      [glass, cap].forEach(function (m) { m.castShadow = true; g.add(m); });
+      register(id, g, [glassMat, capMat], h, pos, label);
     }
 
     function addCanister(id, pos, label) {
       const g = new THREE.Group();
       const h = 0.11, r = 0.052;
-      const bodyMat = new THREE.MeshPhysicalMaterial({
-        color: 0xffffff, metalness: 0, roughness: 0.06,
-        transmission: 0.95, ior: 1.5, thickness: 0.01,
-        transparent: true, envMapIntensity: 1.1, clearcoat: 0.4, clearcoatRoughness: 0.1,
+      // opaque white plastic body (like a real Steritest canister), not glass
+      const bodyMat = new THREE.MeshStandardMaterial({
+        color: 0xeef1f5, metalness: 0.05, roughness: 0.42, envMapIntensity: 0.6,
       });
       const body = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 48), bodyMat);
       const baseMat = new THREE.MeshStandardMaterial({ color: 0x2f6fb0, roughness: 0.4, metalness: 0.3, envMapIntensity: 0.9 });
@@ -394,15 +342,7 @@
         p.position.set(s * 0.018, h / 2 + 0.025, 0); g.add(p);
       });
       [body, base].forEach(function (m) { m.castShadow = true; g.add(m); });
-      // growable liquid column inside the canister (opaque so it shows through
-      // the transmissive glass body)
-      const liqMat = new THREE.MeshStandardMaterial({
-        color: 0x8fd0e0, metalness: 0, roughness: 0.25, envMapIntensity: 0.5,
-      });
-      const liquid = new THREE.Mesh(new THREE.CylinderGeometry(r * 0.9, r * 0.9, 1, 48), liqMat);
-      liquid.visible = false; g.add(liquid);
       register(id, g, [bodyMat, baseMat], h, pos, label);
-      props[id].canLiquid = liquid; props[id].canH = h; props[id].fill = 0;
     }
 
     function addBox(id, pos, w, d, h, color, accent, label) {
@@ -556,6 +496,10 @@
   //   lg/rg: left/right gripper (0 open … 0.8 closed)
   function P(o) { return o; }
   const POSES = {
+    // idle / starting pose — the exact first frame of the real giskardpy
+    // trajectory (static/trajectory.json), i.e. the robot's true planned start
+    // pose, which reads perfectly. Keep in sync if the trajectory is replaced.
+    home:            P({ lpan: 2.620, llift:-1.035, lelb:1.130, lw1:-0.966, lw2:-0.880, lw3:2.070, rpan: 3.707, rlift:-2.070, relb:-1.170, rw1:4.000, rw2:0.820, rw3:0.750, lg:.02, rg:.02 }),
     // ready — both arms reach forward & down over the bench (REAL giskardpy
     // joint values captured from a two-arm reach; matches the robot photos)
     prep:            P({ lpan: 2.939, llift:-1.473, lelb:2.132, lw1:-1.879, lw2:-0.558, lw3:2.739, rpan: 3.345, rlift:-1.668, relb:-2.131, rw1:5.018, rw2:0.558, rw3:-2.737, lg:.08, rg:.08 }),
@@ -587,7 +531,7 @@
   };
 
   // desired configuration the render loop eases toward
-  let target = Object.assign({}, POSES.prep);
+  let target = Object.assign({}, POSES.home);
 
   function poseForStep(id) {
     if (!POSES[id] || !robot) return;
@@ -636,7 +580,7 @@
     // this frees the GPU so dragging the knowledge graph stays smooth
     if (!active && !moved && !needsRender) return;
 
-    if (robot && trajPlaying && traj) {
+    if (DEMO_ARM_MOTION && robot && trajPlaying && traj) {
       stepTrajectory();
     } else if (robot) {
       for (const k in JMAP) {
@@ -702,7 +646,7 @@
     setLabelsAlways: setLabelsAlways,
     setAutoRotate: setAutoRotate,
     setFloorVisible: setFloorVisible,
-    hasTrajectory: function () { return !!traj; },
+    hasTrajectory: function () { return DEMO_ARM_MOTION && !!traj; },
     hasSegment: function (step) { return !!segByStep(step); },
     playTrajectory: playTrajectory,
     stopTrajectory: stopTrajectory,

@@ -324,8 +324,9 @@
   runBtn.addEventListener('click', function () { runGoal(input.value); });
   input.addEventListener('keydown', function (e) { if (e.key === 'Enter') runGoal(input.value); });
 
-  // ---- worked-example strip -------------------------------------------------
+  // ---- worked-example strip (optional; removed from the UI) -----------------
   function buildStrip() {
+    if (!stripEl) return;                 // strip removed from the page
     stripEl.innerHTML = '';
     const tax = document.createElement('div');
     tax.className = 'wstep tax'; tax.dataset.tag = '__tax__';
