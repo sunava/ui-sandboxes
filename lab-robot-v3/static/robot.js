@@ -570,9 +570,14 @@
 
         const canTopY = canW.y + (canister.h || 0.11) / 2 + 0.05;   // above the ports too
         const mouthTarget = canW.clone().setY(canTopY + POUR_CLEAR);
-        // mouth relative to the pivot (grasp height on the vial): h/2 + relW.y
-        const mouthArm = new THREE.Vector3(0, (p.h || 0.14) / 2 + relW.y, 0).applyAxisAngle(axisW, pourTilt);
-        const gt = mouthTarget.sub(mouthArm).sub(new THREE.Vector3(relW.x, 0, relW.z));
+        // full 3-D vector from the grasp point to the vial's mouth (top when
+        // upright), then rotated by the tilt. Rotating the WHOLE vector — not
+        // just its vertical part — is the fix: the horizontal grasp offset also
+        // swings up/down as the vial tips, which the old split-axis form dropped
+        // (that was the residual y error over the canister opening).
+        const graspToMouth = relW.clone().add(new THREE.Vector3(0, (p.h || 0.14) / 2, 0));
+        const mouthArm = graspToMouth.applyAxisAngle(axisW, pourTilt);
+        const gt = mouthTarget.clone().sub(mouthArm);
         const s2 = solveArmIK(gt, detQ.clone());
         if (s2) pourOffsets = offsetsFrom(s2, gD);
       }
