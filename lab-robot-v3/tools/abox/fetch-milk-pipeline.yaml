@@ -1,0 +1,242 @@
+# Worked-example ABox — "Fetch the Milk", full-pipeline model
+# Source:  L0-raw-material/notes/2026-07-15-fetch-milk-aicor-model.md
+# L1:      L1-okf-knowledge-base/bundle/concepts/fetch-milk-pipeline-model.md
+#
+# The L2 (machine-checkable) realization of the full-pipeline milk model. Where
+# abox/milk-example.yaml instantiates one narrow slice (the groundsTo binding +
+# the slip-and-repair episode), this ABox instantiates the pipeline STAGES that
+# fragment omits — the grounding record, the nuisance model, the designator
+# layer, the warrant gateway, the evidence-bearing trace, the six-component
+# verdict tuple, and the scoped competence claim — each typed against the
+# existing L2 TBox and HermiT-checked. It is an *illustrative fragment*, not a
+# closed world (it inherits the milk example's incompleteness disclaimer).
+#
+# The one thing HermiT tests here: every individual respects the physical/
+# abstract cut. Only the body and the world objects are Physical; every record,
+# model, plan, designator, trace, verdict, and claim is Abstract. A single
+# mistyped instance (a GroundingRecord asserted Physical, a Designator asserted
+# as its carton) would make the ontology inconsistent.
+
+classes:
+  # ABox-local classes the TBox does not already carry, placed on the cut so the
+  # reasoner can check them. (The TBox classes used below — GroundingRecord,
+  # NuisanceModel, Designator, CommitmentChecking, VerdictComponent,
+  # CompetenceClaim, … — are imported from the exported ontology and need no
+  # re-declaration.)
+  GroundingField: Abstract       # one committed field of the 14-field G_i^BWS tuple
+  Observation: Abstract          # a partial projection of a world-state
+  Proposal: Abstract             # the z̃_t a commitment gateway takes as input
+  WarrantedExecutiveCommitment: Abstract   # the gateway's positive verdict
+  # The next four are enum-defined TBox classes the OWL exporter treats as
+  # documentary (so it leaves them off the cut); they are all abstract value/
+  # category spaces, so we place them Abstract here to bring their individuals
+  # under the reasoner's physical/abstract check rather than leaving them unplaced.
+  AccountableDimension: Abstract
+  NuisanceComponent: Abstract
+  ResolutionMode: Abstract
+  DesignatorResolution: Abstract
+
+individuals:
+  # ---- §0/§2 Physical: the body and the world objects (the ONLY physical side) ----
+  robot: [RobotBody]
+  gripper: [EndEffector]
+  cam: [Sensor]
+  fridge: [ArticulatedObject]
+  door: [ArticulatedObject]
+  carton_sealed: [PhysicalObject]     # the resolved referent's carton
+  carton_open: [PhysicalObject]       # the recorded alternative's bottle
+  shelf: [PhysicalObject]
+  table: [PhysicalObject]
+  ws_0: [WorldState]                  # the initial physical world-state
+
+  # ---- §1 Task request and scope (Abstract) ----
+  bws: [BodyWorldSystem]
+  rwms: [RobotWorldManipulationSystem]
+  ti_fetch_milk: [TaskInstance]
+  scope: [TaskScope]
+
+  # ---- §3 Grounded task specification: the 14-field grounding record ----
+  grounding: [TaskGrounding]
+  G: [GroundingRecord]
+  obs_1: [Observation]
+  gf_referent: [GroundingField]       # D  — resolved referent
+  gf_entities: [GroundingField]       # Ent
+  gf_effects: [GroundingField]        # Eff
+  gf_safety: [GroundingField]         # C_safe
+  gf_monitors: [GroundingField]       # M
+  gf_repairs: [GroundingField]        # Rep
+  gf_abstention: [GroundingField]     # Abs
+  gf_trace: [GroundingField]          # E_trace
+  gf_alt: [GroundingField]            # Alt — the open bottle, kept with confidence
+  gc_referent: [GroundingCommitment]  # the committed referent binding
+
+  # ---- §4 Grounded problem, its class, the nuisance model ----
+  P: [GroundedManipulationProblem]
+  P_class: [ManipulationProblemClass]
+  ph_reach: [Phase]
+  ph_transport: [Phase]
+  ph_carry: [Phase]
+  g_deliver: [AchievementGoal]
+  g_grasp: [MaintenanceGoal]          # restorable (see milk-example §7)
+  g_upright: [MaintenanceGoal]
+  g_nodrop: [PreventionGoal]
+  nu_model: [NuisanceModel]
+  nu_identity: [NuisanceComponent]    # ObjectNuisance — carton identity
+  nu_fill: [NuisanceComponent]        # PhysicalNuisance — fill state as a force (§6)
+  nu_friction: [NuisanceComponent]    # PhysicalNuisance
+  nu_occlusion: [NuisanceComponent]   # SensingNuisance — shelf occlusion
+  nu_layout: [NuisanceComponent]      # LayoutNuisance — obstacle placement
+  nu_requester: [NuisanceComponent]   # HumanNuisance — requester location
+
+  # ---- §5 Executive, plan, designators, belief-state twin ----
+  me: [ManipulationExecutive]
+  plan: [RuntimeReasonablePlan]
+  sdt: [SemanticDigitalTwin]
+  d_carton: [Designator]              # entity designator
+  d_shelf: [Designator]               # location designator
+  d_grasp: [Designator]               # action designator
+  res_carton: [DesignatorResolution]  # CandidateSet -> UniqueReferent
+  mode_descriptive: [Descriptive]     # "sealed milk carton"
+  mode_deictic: [Deictic]             # "the carton in the gripper" (post-grasp)
+  mode_relational: [Relational]       # the shelf, relative to the fridge frame
+
+  # ---- §6 Action realization: the warrant gateway ----
+  z_grasp: [Proposal]                 # the grasp proposal presented to the gateway
+  gate: [CommitmentChecking]
+  fds_grasp: [ForceDynamicSchema]     # fill-state-as-force schema the grasp is governed by
+  mt_grasp: [BodyWorldProcessMicrotheory]   # the grasp microtheory (slip signature)
+  wc_grasp: [WarrantedExecutiveCommitment]  # gateway yields a warranted commitment
+
+  # ---- §7 Monitoring and repair (the slip -> regrasp) ----
+  mon_grasp: [ProcessMonitor]
+  slip_sig: [FailureSignature]        # the incipient-slip signature
+  repair_regrasp: [Repair]            # AddSupport + Reparameterize
+
+  # ---- §8 Trace construction ----
+  E: [ManipulationEpisode]            # the projected slip-and-repair episode E_milk_1
+  rec: [Recording]                    # the raw recording
+  trace: [EvidenceBearingTrace]       # interprets the recording
+  regime: [AssessmentRegime]          # the regime the trace is relative to
+  o_grasp: [WorldOccurrence]
+  o_slip: [WorldOccurrence]
+  o_slip_B: [BeliefOccurrence]        # the ME registers the slip after Δt_obs
+  o_regrasp: [WorldOccurrence]
+  o_place: [WorldOccurrence]
+
+  # ---- §9 Verdict (six components) and competence claim ----
+  v_out: [VerdictComponent]
+  v_disp: [VerdictComponent]
+  v_adeq: [VerdictComponent]
+  v_rob: [VerdictComponent]
+  v_rec: [VerdictComponent]
+  v_evid: [VerdictComponent]
+  d_outcome: [AccountableDimension]
+  d_disposition: [AccountableDimension]
+  d_adequacy: [AccountableDimension]
+  d_robustness: [AccountableDimension]
+  d_recoverability: [AccountableDimension]
+  d_evidential: [AccountableDimension]
+  claim: [CompetenceClaim]
+  degree: [CompetenceDegree]
+
+relations:
+  # §1–2 embodiment and system framing
+  - [robot, hasProperPart, gripper]
+  - [robot, hasSensor, cam]
+  - [fridge, hasProperPart, door]
+  - [bws, hasCoupling, robot]
+  - [rwms, hasProperPart, bws]
+  - [ti_fetch_milk, isWithinScopeOf, scope]
+
+  # §3 grounding record: fields, the resolved referent, the kept alternative
+  - [G, producedBy, grounding]
+  - [G, hasField, gf_referent]
+  - [G, hasField, gf_entities]
+  - [G, hasField, gf_effects]
+  - [G, hasField, gf_safety]
+  - [G, hasField, gf_monitors]
+  - [G, hasField, gf_repairs]
+  - [G, hasField, gf_abstention]
+  - [G, hasField, gf_trace]
+  - [G, hasField, gf_alt]
+  - [gc_referent, references, d_carton]
+  - [gf_referent, references, carton_sealed]
+  - [gf_alt, references, carton_open]
+  - [obs_1, projectionOf, ws_0]
+
+  # §4 problem, class, phases, goals, nuisance model
+  - [ti_fetch_milk, isInstanceOf, P_class]
+  - [P, addresses, P_class]
+  - [P, hasPhase, ph_reach]
+  - [P, hasPhase, ph_transport]
+  - [P, hasPhase, ph_carry]
+  - [P, hasGoal, g_deliver]
+  - [P, hasGoal, g_grasp]
+  - [P, hasGoal, g_upright]
+  - [P, hasGoal, g_nodrop]
+  - [P_class, definesRobustnessRange, nu_model]
+  - [nu_model, hasComponent, nu_identity]
+  - [nu_model, hasComponent, nu_fill]
+  - [nu_model, hasComponent, nu_friction]
+  - [nu_model, hasComponent, nu_occlusion]
+  - [nu_model, hasComponent, nu_layout]
+  - [nu_model, hasComponent, nu_requester]
+
+  # §5 plan and designators, resolved against the twin
+  - [me, generates, plan]
+  - [plan, hasProperPart, d_carton]
+  - [plan, hasProperPart, d_shelf]
+  - [plan, hasProperPart, d_grasp]
+  - [d_carton, resolvesTo, res_carton]
+  - [d_carton, resolvesVia, mode_descriptive]
+  - [d_shelf, resolvesVia, mode_relational]
+  - [d_grasp, resolvesVia, mode_deictic]
+  - [d_carton, boundTo, carton_sealed]
+  - [d_carton, against, sdt]
+
+  # §6 warrant gateway
+  - [gate, takesProposal, z_grasp]
+  - [gate, uses, mt_grasp]
+  - [gate, against, sdt]
+  - [gate, yields, wc_grasp]
+  - [wc_grasp, governedByPhysics, fds_grasp]
+
+  # §7 monitoring and repair
+  - [mon_grasp, monitorFor, mt_grasp]
+  - [mon_grasp, producesRecordIn, trace]
+  - [mon_grasp, checks, slip_sig]
+  - [repair_regrasp, respondsTo, slip_sig]
+  - [repair_regrasp, transforms, wc_grasp]
+  - [repair_regrasp, accountableVia, trace]
+
+  # §8 trace and episode
+  - [E, addresses, P]
+  - [E, generatedByExecutive, me]
+  - [E, hasOccurrence, o_grasp]
+  - [E, hasOccurrence, o_slip]
+  - [E, hasOccurrence, o_regrasp]
+  - [E, hasOccurrence, o_place]
+  - [E, hasBeliefOccurrence, o_slip_B]
+  - [o_slip, renders, o_slip_B]
+  - [trace, interprets, rec]
+  - [trace, relativeTo, regime]
+
+  # §9 six-component verdict, then the scoped competence claim
+  - [v_out, assesses, E]
+  - [v_disp, assesses, E]
+  - [v_adeq, assesses, E]
+  - [v_rob, assesses, E]
+  - [v_rec, assesses, E]
+  - [v_evid, assesses, E]
+  - [v_out, alongDimension, d_outcome]
+  - [v_disp, alongDimension, d_disposition]
+  - [v_adeq, alongDimension, d_adequacy]
+  - [v_rob, alongDimension, d_robustness]
+  - [v_rec, alongDimension, d_recoverability]
+  - [v_evid, alongDimension, d_evidential]
+  - [v_out, groundedIn, trace]
+  - [v_rec, groundedIn, trace]
+  - [claim, claimsOver, P_class]
+  - [claim, heldBy, rwms]
+  - [claim, warrantedBy, trace]
+  - [claim, atDegree, degree]

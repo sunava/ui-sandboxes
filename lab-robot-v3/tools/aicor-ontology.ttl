@@ -1,0 +1,3376 @@
+@prefix : <http://aicor.knowledge/l2-ontology.owl#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://aicor.knowledge/l2-ontology.owl> a owl:Ontology .
+
+:AICORReferenceManipulationExecutive a owl:Class ;
+    rdfs:label "AICORReferenceManipulationExecutive"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onClass :ManipulationControlProgram ;
+            owl:onProperty :hasProperPart ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:onClass :ManipulationExecutiveOperatingSystem ;
+            owl:onProperty :hasProperPart ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:hasValue false ;
+            owl:onProperty :isArchitectureNeutral ],
+        :ManipulationExecutive,
+        owl:Thing .
+
+:AbstentionSignal a owl:Class ;
+    rdfs:label "AbstentionSignal"^^xsd:string ;
+    rdfs:subClassOf :Signal,
+        owl:Thing .
+
+:AccountableImplementationStructure a owl:Class ;
+    rdfs:label "AccountableImplementationStructure"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :characterizes ;
+            owl:someValuesFrom :ComputationalMedium ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing .
+
+:AchievementGoal a owl:Class ;
+    rdfs:label "AchievementGoal"^^xsd:string ;
+    rdfs:subClassOf :Goal,
+        owl:Thing .
+
+:ActionEventType a owl:Class ;
+    rdfs:label "ActionEventType"^^xsd:string ;
+    rdfs:subClassOf :AbstractEntity,
+        :EventType,
+        owl:Thing .
+
+:ActionProposalResource a owl:Class ;
+    rdfs:label "ActionProposalResource"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue true ;
+            owl:onProperty :nearActionInterface ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing .
+
+:ActionReferent a owl:Class ;
+    rdfs:label "ActionReferent"^^xsd:string ;
+    rdfs:subClassOf :AbstractEntity,
+        owl:Thing .
+
+:ActionRelatedForceCorridor a owl:Class ;
+    rdfs:label "ActionRelatedForceCorridor"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:ActionRelatedGrasp a owl:Class ;
+    rdfs:label "ActionRelatedGrasp"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:ActionRelatedMotion a owl:Class ;
+    rdfs:label "ActionRelatedMotion"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:ActionRelatedPlace a owl:Class ;
+    rdfs:label "ActionRelatedPlace"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:ActionRelatedPour a owl:Class ;
+    rdfs:label "ActionRelatedPour"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:AdmissibleAction a owl:Class ;
+    rdfs:label "AdmissibleAction"^^xsd:string ;
+    rdfs:subClassOf :CandidateAction,
+        owl:Thing .
+
+:CapabilityAssertion a owl:Class ;
+    rdfs:label "CapabilityAssertion"^^xsd:string ;
+    rdfs:subClassOf :AbstractEntity,
+        :BodyWorldConstraint,
+        owl:Thing .
+
+:CausalAdmissibility a owl:Class ;
+    rdfs:label "CausalAdmissibility"^^xsd:string ;
+    rdfs:subClassOf :AbstractEntity,
+        :dul_Description,
+        owl:Thing .
+
+:CompletionSignal a owl:Class ;
+    rdfs:label "CompletionSignal"^^xsd:string ;
+    rdfs:subClassOf :Signal,
+        owl:Thing .
+
+:ComponentCompetenceClaim a owl:Class ;
+    rdfs:label "ComponentCompetenceClaim"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :requiresDeclaredScope ;
+            owl:someValuesFrom :ResponsibleClaimScope ],
+        :CompetenceClaim,
+        owl:Thing .
+
+:ConceptFamily a owl:Class ;
+    rdfs:label "ConceptFamily"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onClass :AccountabilityQuestion ;
+            owl:onProperty :answersQuestion ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        :AbstractEntity,
+        :dul_Concept,
+        owl:Thing .
+
+:ConceptFamilyEnum a owl:Class ;
+    rdfs:label "ConceptFamilyEnum"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:Constraint a owl:Class ;
+    rdfs:label "Constraint"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue "motionManifold"^^xsd:string ;
+            owl:onProperty :governedBy ],
+        :CouplingType,
+        owl:Thing .
+
+:ConstraintBasedControl a owl:Class ;
+    rdfs:label "ConstraintBasedControl"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :expressesTaskAs ;
+            owl:someValuesFrom :ConstraintSet ],
+        [ a owl:Restriction ;
+            owl:onProperty :solvesFor ;
+            owl:someValuesFrom :ActuatorInput ],
+        :AbstractEntity,
+        :RobotControlLaw,
+        owl:Thing .
+
+:CouplingTerm a owl:Class ;
+    rdfs:label "CouplingTerm"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :hasCouplingType ;
+            owl:someValuesFrom :CouplingType ],
+        :dul_Description,
+        owl:Thing .
+
+:DataGenerationEngine a owl:Class ;
+    rdfs:label "DataGenerationEngine"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :usesModel ;
+            owl:someValuesFrom :DigitalBodyWorldSystem ],
+        :dul_InformationObject,
+        owl:Thing .
+
+:Deictic a owl:Class ;
+    rdfs:label "Deictic"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:DependencyEdge a owl:Class ;
+    rdfs:label "DependencyEdge"^^xsd:string ;
+    rdfs:subClassOf :dul_Description,
+        owl:Thing .
+
+:Descriptive a owl:Class ;
+    rdfs:label "Descriptive"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:Designator a owl:Class ;
+    rdfs:label "Designator"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :resolvesTo ;
+            owl:someValuesFrom :DesignatorResolution ],
+        [ a owl:Restriction ;
+            owl:onProperty :resolvesVia ;
+            owl:someValuesFrom :ResolutionMode ],
+        [ a owl:Restriction ;
+            owl:onProperty :references ;
+            owl:someValuesFrom :DesignatorTarget ],
+        [ a owl:Restriction ;
+            owl:hasValue true ;
+            owl:onProperty :lazy ],
+        :dul_Description,
+        owl:Thing .
+
+:DesignatorReferent a owl:Class ;
+    rdfs:label "DesignatorReferent"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:DigitalResearchLaboratory a owl:Class ;
+    rdfs:label "DigitalResearchLaboratory"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :usesModel ;
+            owl:someValuesFrom :DigitalBodyWorldSystem ],
+        :dul_InformationObject,
+        owl:Thing .
+
+:DownstreamModel a owl:Class ;
+    rdfs:label "DownstreamModel"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :integratedInto ;
+            owl:someValuesFrom :CommitmentRelevantStructure ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing .
+
+:EnvisionedTimeline a owl:Class ;
+    rdfs:label "EnvisionedTimeline"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue true ;
+            owl:onProperty :isGroundedInSimulation ],
+        [ a owl:Restriction ;
+            owl:onProperty :projectionOfBranch ;
+            owl:someValuesFrom :ManipulationEpisode ],
+        [ a owl:Restriction ;
+            owl:onProperty :relativeToScenario ;
+            owl:someValuesFrom :Scenario ],
+        [ a owl:Restriction ;
+            owl:onProperty :producedByEnvisioning ;
+            owl:someValuesFrom :Envisioning ],
+        [ a owl:Restriction ;
+            owl:onProperty :translatedFrom ;
+            owl:someValuesFrom :SimulationLog ],
+        :dul_InformationObject,
+        owl:Thing ;
+    owl:disjointWith :SimulationLog .
+
+:ExecutiveBehaviouralSpecification a owl:Class ;
+    rdfs:label "ExecutiveBehaviouralSpecification"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :hasProperty ;
+            owl:someValuesFrom :ExecutiveProperty ],
+        [ a owl:Restriction ;
+            owl:onProperty :specifies ;
+            owl:someValuesFrom :ManipulationExecutive ],
+        [ a owl:Restriction ;
+            owl:onProperty :relativeToProblemFamily ;
+            owl:someValuesFrom :ManipulationProblemClass ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing ;
+    owl:disjointWith :ManipulationExecutive .
+
+:ExecutiveRealization a owl:Class ;
+    rdfs:label "ExecutiveRealization"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :distinctFrom ;
+            owl:someValuesFrom :ExecutiveArchitecture ],
+        [ a owl:Restriction ;
+            owl:onProperty :realizationOf ;
+            owl:someValuesFrom :ManipulationExecutive ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing .
+
+:FailureSignal a owl:Class ;
+    rdfs:label "FailureSignal"^^xsd:string ;
+    rdfs:subClassOf :Signal,
+        owl:Thing .
+
+:Force a owl:Class ;
+    rdfs:label "Force"^^xsd:string ;
+    rdfs:subClassOf :PhysicalEntity,
+        owl:Thing .
+
+:ForceClosure a owl:Class ;
+    rdfs:label "ForceClosure"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue "frictionCone"^^xsd:string ;
+            owl:onProperty :governedBy ],
+        :CouplingType,
+        owl:Thing .
+
+:GroundedManipulationProblem a owl:Class ;
+    rdfs:label "GroundedManipulationProblem"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :hasNuisanceCondition ;
+            owl:someValuesFrom :NuisanceComponent ],
+        [ a owl:Restriction ;
+            owl:onProperty :generatesTrace ;
+            owl:someValuesFrom :ManipulationEpisode ],
+        [ a owl:Restriction ;
+            owl:onClass :BodyWorldSystem ;
+            owl:onProperty :hasBodyWorldSystem ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:onClass :BWSRelativeTaskSpecification ;
+            owl:onProperty :hasTaskSpecification ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:hasValue true ;
+            owl:onProperty :isAssessmentInput ],
+        [ a owl:Restriction ;
+            owl:onProperty :memberOf ;
+            owl:someValuesFrom :ProblemDomain ],
+        [ a owl:Restriction ;
+            owl:hasValue false ;
+            owl:onProperty :isRWMSPart ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing .
+
+:GroundedSchema a owl:Class ;
+    rdfs:label "GroundedSchema"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:GroundingCommitment a owl:Class ;
+    rdfs:label "GroundingCommitment"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :collectedInto ;
+            owl:someValuesFrom :GroundingRecord ],
+        [ a owl:Restriction ;
+            owl:hasValue true ;
+            owl:onProperty :isRevisable ],
+        [ a owl:Restriction ;
+            owl:onProperty :constructedBy ;
+            owl:someValuesFrom :TaskGrounding ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing .
+
+:HonestyProperty a owl:Class ;
+    rdfs:label "HonestyProperty"^^xsd:string ;
+    rdfs:subClassOf :AbstractEntity,
+        :ExecutiveProperty,
+        owl:Thing .
+
+:IncapabilityAssertion a owl:Class ;
+    rdfs:label "IncapabilityAssertion"^^xsd:string ;
+    rdfs:subClassOf :AbstractEntity,
+        :BodyWorldConstraint,
+        owl:Thing .
+
+:IntervalTemporalLogic a owl:Class ;
+    rdfs:label "IntervalTemporalLogic"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :reifies ;
+            owl:someValuesFrom :ReifiedTemporalEntity ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasPredicate ;
+            owl:someValuesFrom :TemporalPredicate ],
+        [ a owl:Restriction ;
+            owl:onProperty :reasonsOver ;
+            owl:someValuesFrom :Chronicle ],
+        :AbstractEntity,
+        :dul_InformationObject,
+        owl:Thing .
+
+:KRRResource a owl:Class ;
+    rdfs:label "KRRResource"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :makesConcrete ;
+            owl:someValuesFrom :KRRHypothesis ],
+        [ a owl:Restriction ;
+            owl:hasValue "true, isInspectable value true"^^xsd:string ;
+            owl:onProperty :isExplicit ],
+        [ a owl:Restriction ;
+            owl:onProperty :resourceFor ;
+            owl:someValuesFrom :ManipulationExecutive ],
+        [ a owl:Restriction ;
+            owl:hasValue "true, isOperational value true"^^xsd:string ;
+            owl:onProperty :isRevisable ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing ;
+    owl:disjointWith :BodyWorldSystem .
+
+:KinematicRedundancy a owl:Class ;
+    rdfs:label "KinematicRedundancy"^^xsd:string ;
+    rdfs:subClassOf :dul_Quality,
+        owl:Thing .
+
+:KinematicSingularity a owl:Class ;
+    rdfs:label "KinematicSingularity"^^xsd:string ;
+    rdfs:subClassOf :dul_Quality,
+        owl:Thing .
+
+:MaintenanceGoal a owl:Class ;
+    rdfs:label "MaintenanceGoal"^^xsd:string ;
+    rdfs:subClassOf :Goal,
+        owl:Thing .
+
+:ManipulationProblem a owl:Class ;
+    rdfs:label "ManipulationProblem"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :assignsClass ;
+            owl:someValuesFrom :TaskRelativeClass ],
+        [ a owl:Restriction ;
+            owl:hasValue true ;
+            owl:onProperty :isGrounded ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasGoal ;
+            owl:someValuesFrom :Goal ],
+        [ a owl:Restriction ;
+            owl:onClass :BodyWorldSystem ;
+            owl:onProperty :relativeTo ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:onProperty :classifies ;
+            owl:someValuesFrom :BodyWorldTrajectory ],
+        :dul_Description,
+        owl:Thing ;
+    owl:disjointWith :RobotWorldManipulationSystem .
+
+:ManipulationTaskSpecification a owl:Class ;
+    rdfs:label "ManipulationTaskSpecification"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :hasQualityFunctional ;
+            owl:someValuesFrom :QualityFunctional ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasGoal ;
+            owl:someValuesFrom :Goal ],
+        :dul_Description,
+        owl:Thing .
+
+:MasteryClaim a owl:Class ;
+    rdfs:label "MasteryClaim"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :satisfies ;
+            owl:someValuesFrom :MasteryCriterion ],
+        [ a owl:Restriction ;
+            owl:onProperty :aboutSystemFamily ;
+            owl:someValuesFrom :RobotWorldManipulationSystem ],
+        [ a owl:Restriction ;
+            owl:onProperty :overProblemFamily ;
+            owl:someValuesFrom :ManipulationProblemClass ],
+        [ a owl:Restriction ;
+            owl:onProperty :strengthens ;
+            owl:someValuesFrom :CompetenceClaim ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing .
+
+:ModelPredictiveControl a owl:Class ;
+    rdfs:label "ModelPredictiveControl"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :appliesFirstOf ;
+            owl:someValuesFrom :ControlSequence ],
+        [ a owl:Restriction ;
+            owl:onProperty :optimizes ;
+            owl:someValuesFrom :ControlSequence ],
+        [ a owl:Restriction ;
+            owl:onProperty :resolvesEach ;
+            owl:someValuesFrom :ControlCycle ],
+        :AbstractEntity,
+        :OptimizationBasedControl,
+        owl:Thing .
+
+:OpenSurfaceSpreading a owl:Class ;
+    rdfs:label "OpenSurfaceSpreading"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :arrestedByEvent ;
+            owl:someValuesFrom :SpreadArrestEvent ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasFilmThickness ;
+            owl:someValuesFrom :FilmThickness ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasCoverageTarget ;
+            owl:someValuesFrom :SpreadRadius ],
+        [ a owl:Restriction ;
+            owl:onProperty :onFlatObject ;
+            owl:someValuesFrom :dul_PhysicalObject ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasSpreadRadius ;
+            owl:someValuesFrom :SpreadRadius ],
+        :BodyWorldProcessMicrotheory,
+        owl:Thing .
+
+:OpenUpEvent a owl:Class ;
+    rdfs:label "OpenUpEvent"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :initiatesStateType ;
+            owl:someValuesFrom :OpenContainerState ],
+        [ a owl:Restriction ;
+            owl:onProperty :actsOnState ;
+            owl:someValuesFrom :CrackedContainerState ],
+        :EventType,
+        owl:Thing .
+
+:ParameterSample a owl:Class ;
+    rdfs:label "ParameterSample"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :drawnFrom ;
+            owl:someValuesFrom :ParameterSpace ],
+        :dul_Region,
+        owl:Thing .
+
+:PartialDescription a owl:Class ;
+    rdfs:label "PartialDescription"^^xsd:string ;
+    rdfs:subClassOf :dul_InformationObject,
+        owl:Thing .
+
+:Phase a owl:Class ;
+    rdfs:label "Phase"^^xsd:string ;
+    rdfs:subClassOf :AbstractEntity,
+        owl:Thing .
+
+:PhysicalObject a owl:Class ;
+    rdfs:label "PhysicalObject"^^xsd:string ;
+    rdfs:subClassOf :PhysicalEntity,
+        owl:Thing .
+
+:PreventionGoal a owl:Class ;
+    rdfs:label "PreventionGoal"^^xsd:string ;
+    rdfs:subClassOf :Goal,
+        owl:Thing .
+
+:Process a owl:Class ;
+    rdfs:label "Process"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue "substanceDynamics"^^xsd:string ;
+            owl:onProperty :governedBy ],
+        :CouplingType,
+        owl:Thing .
+
+:ProcessControlAlignment a owl:Class ;
+    rdfs:label "ProcessControlAlignment"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :requiresCounterpart ;
+            owl:someValuesFrom :ExecutiveCounterpart ],
+        [ a owl:Restriction ;
+            owl:onProperty :constrains ;
+            owl:someValuesFrom :ManipulationExecutive ],
+        :dul_Description,
+        owl:Thing .
+
+:ProposalToCommitmentPipeline a owl:Class ;
+    rdfs:label "ProposalToCommitmentPipeline"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :pipelineOf ;
+            owl:someValuesFrom :DualProcessManipulationExecutive ],
+        [ a owl:Restriction ;
+            owl:onProperty :operationalizes ;
+            owl:someValuesFrom :ProposalNotCommitment ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing .
+
+:QueryTemplate a owl:Class ;
+    rdfs:label "QueryTemplate"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :templateOf ;
+            owl:someValuesFrom :KnowledgeQueryLanguage ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasParameter ;
+            owl:someValuesFrom :Variable ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing .
+
+:RecedingHorizon a owl:Class ;
+    rdfs:label "RecedingHorizon"^^xsd:string ;
+    rdfs:subClassOf :dul_Region,
+        owl:Thing ;
+    owl:disjointWith :InstantaneousHorizon .
+
+:ReflectiveRepresentation a owl:Class ;
+    rdfs:label "ReflectiveRepresentation"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :enables ;
+            owl:someValuesFrom :ResponsibleNonAccomplishment ],
+        [ a owl:Restriction ;
+            owl:onProperty :representsSelfStateOf ;
+            owl:someValuesFrom :ManipulationExecutive ],
+        :AbstractEntity,
+        :dul_InformationObject,
+        owl:Thing ;
+    owl:disjointWith :SemanticDigitalTwin .
+
+:RegimeDependentProperty a owl:Class ;
+    rdfs:label "RegimeDependentProperty"^^xsd:string ;
+    rdfs:subClassOf :AbstractEntity,
+        :ExecutiveProperty,
+        owl:Thing .
+
+:Relational a owl:Class ;
+    rdfs:label "Relational"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:SceneGraphToKnowledgeGraph a owl:Class ;
+    rdfs:label "SceneGraphToKnowledgeGraph"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :appliesStep ;
+            owl:someValuesFrom :SemanticTagging ],
+        [ a owl:Restriction ;
+            owl:onProperty :produces ;
+            owl:someValuesFrom :KnowledgeGraph ],
+        [ a owl:Restriction ;
+            owl:onProperty :uses ;
+            owl:someValuesFrom :USDOntology ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing .
+
+:SensorModel a owl:Class ;
+    rdfs:label "SensorModel"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :producesSynthetic ;
+            owl:someValuesFrom :ExpectedObservation ],
+        [ a owl:Restriction ;
+            owl:onProperty :modelOf ;
+            owl:someValuesFrom :Sensor ],
+        :AbstractEntity,
+        :dul_InformationObject,
+        owl:Thing ;
+    owl:disjointWith :Observation,
+        :Sensor .
+
+:StructuredReactiveController a owl:Class ;
+    rdfs:label "StructuredReactiveController"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :calls ;
+            owl:someValuesFrom :ProcessModule ],
+        [ a owl:Restriction ;
+            owl:onProperty :mirrors ;
+            owl:someValuesFrom :ForceDynamicSchema ],
+        [ a owl:Restriction ;
+            owl:hasValue true ;
+            owl:onProperty :system2 ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasPolicy ;
+            owl:someValuesFrom :ConcurrentPolicy ],
+        [ a owl:Restriction ;
+            owl:onClass :PrimaryActivity ;
+            owl:onProperty :hasPrimaryActivity ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:onProperty :reads ;
+            owl:someValuesFrom :Fluent ],
+        :ManipulationControlProgram,
+        owl:Thing .
+
+:SuccessSignal a owl:Class ;
+    rdfs:label "SuccessSignal"^^xsd:string ;
+    rdfs:subClassOf :Signal,
+        owl:Thing .
+
+:TaskAchievingBodyMotion a owl:Class ;
+    rdfs:label "TaskAchievingBodyMotion"^^xsd:string ;
+    rdfs:subClassOf :BodyMotion,
+        owl:Thing .
+
+:ThermalSetArrest a owl:Class ;
+    rdfs:label "ThermalSetArrest"^^xsd:string ;
+    rdfs:subClassOf :SpreadArrestEvent,
+        owl:Thing .
+
+:TripleBasedQuery a owl:Class ;
+    rdfs:label "TripleBasedQuery"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :implementationOf ;
+            owl:someValuesFrom :EntityRelationQueryLanguage ],
+        [ a owl:Restriction ;
+            owl:onProperty :usesPredicateFrom ;
+            owl:someValuesFrom :SomaOntology ],
+        [ a owl:Restriction ;
+            owl:onProperty :executedBy ;
+            owl:someValuesFrom :SparqlQueryAnsweringModule ],
+        :AbstractEntity,
+        :dul_InformationObject,
+        owl:Thing .
+
+:TriplePattern a owl:Class ;
+    rdfs:label "TriplePattern"^^xsd:string ;
+    rdfs:subClassOf :dul_InformationObject,
+        owl:Thing .
+
+:VLAModel a owl:Class ;
+    rdfs:label "VLAModel"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:WorldOccurrence a owl:Class ;
+    rdfs:label "WorldOccurrence"^^xsd:string ;
+    rdfs:subClassOf :AbstractEntity,
+        :Occurrence,
+        owl:Thing ;
+    owl:disjointWith :BeliefOccurrence .
+
+:WorldState a owl:Class ;
+    rdfs:label "WorldState"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onClass :ContinuousState ;
+            owl:onProperty :hasContinuousState ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:onClass :DiscreteModeStructure ;
+            owl:onProperty :hasDiscreteMode ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        :PhysicalEntity,
+        :dul_PhysicalObject,
+        owl:Thing .
+
+:Xacro a owl:Class ;
+    rdfs:label "Xacro"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :generates ;
+            owl:someValuesFrom :URDF ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasParameter ;
+            owl:someValuesFrom :Parameter ],
+        :AbstractEntity,
+        :dul_InformationObject,
+        owl:Thing ;
+    owl:disjointWith :URDF .
+
+:YieldEquilibriumArrest a owl:Class ;
+    rdfs:label "YieldEquilibriumArrest"^^xsd:string ;
+    rdfs:subClassOf :SpreadArrestEvent,
+        owl:Thing .
+
+:hasDimension a owl:DatatypeProperty .
+
+:AccountabilityQuestion a owl:Class ;
+    rdfs:label "AccountabilityQuestion"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:AccountableDimension a owl:Class ;
+    rdfs:label "AccountableDimension"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:ActionRelatedConcept a owl:Class ;
+    rdfs:label "ActionRelatedConcept"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :vocabularyFor ;
+            owl:someValuesFrom :CommitmentChecking ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing ;
+    owl:disjointWith :WarrantedExecutiveCommitment .
+
+:ArticulatedObject a owl:Class ;
+    rdfs:label "ArticulatedObject"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :hasJoint ;
+            owl:someValuesFrom :Joint ],
+        :dul_PhysicalObject,
+        owl:Thing .
+
+:AssessmentRegime a owl:Class ;
+    rdfs:label "AssessmentRegime"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :appliesCritic ;
+            owl:someValuesFrom :Critic ],
+        [ a owl:Restriction ;
+            owl:hasValue true ;
+            owl:onProperty :isExecutiveIndependent ],
+        [ a owl:Restriction ;
+            owl:onProperty :governsClaim ;
+            owl:someValuesFrom :CompetenceClaim ],
+        [ a owl:Restriction ;
+            owl:onProperty :producesVerdict ;
+            owl:someValuesFrom :VerdictComponent ],
+        :dul_Description,
+        owl:Thing ;
+    owl:disjointWith :EvidenceBearingTrace,
+        :ManipulationExecutive .
+
+:BeliefOccurrence a owl:Class ;
+    rdfs:label "BeliefOccurrence"^^xsd:string ;
+    rdfs:subClassOf :AbstractEntity,
+        :Occurrence,
+        owl:Thing .
+
+:CandidateAction a owl:Class ;
+    rdfs:label "CandidateAction"^^xsd:string ;
+    rdfs:subClassOf :soma_Action,
+        owl:Thing ;
+    owl:disjointWith :DistributionalPlausibility,
+        :Performance .
+
+:CollisionGeometry a owl:Class ;
+    rdfs:label "CollisionGeometry"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :consumedBy ;
+            owl:someValuesFrom :PhysicsEngine ],
+        :SimulationAsset,
+        owl:Thing .
+
+:CommitmentRecord a owl:Class ;
+    rdfs:label "CommitmentRecord"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :contains ;
+            owl:someValuesFrom :ManipulationEpisode ],
+        [ a owl:Restriction ;
+            owl:onProperty :contains ;
+            owl:someValuesFrom :ActionToken ],
+        :dul_Description,
+        owl:Thing .
+
+:CommitmentRelevantStructure a owl:Class ;
+    rdfs:label "CommitmentRelevantStructure"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:CompetenceDegree a owl:Class ;
+    rdfs:label "CompetenceDegree"^^xsd:string ;
+    rdfs:subClassOf :dul_Region,
+        owl:Thing .
+
+:ComponentDescription a owl:Class ;
+    rdfs:label "ComponentDescription"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:ComputationalMedium a owl:Class ;
+    rdfs:label "ComputationalMedium"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :realizesVia ;
+            owl:someValuesFrom :RepresentationProcessCapabilityTriad ],
+        :AbstractEntity,
+        :dul_InformationObject,
+        owl:Thing ;
+    owl:disjointWith :BodyWorldSystem .
+
+:ConcurrentPolicy a owl:Class ;
+    rdfs:label "ConcurrentPolicy"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :maintainsConditionFor ;
+            owl:someValuesFrom :PrimaryActivity ],
+        :dul_Description,
+        owl:Thing .
+
+:Configuration a owl:Class ;
+    rdfs:label "Configuration"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:ContactPair a owl:Class ;
+    rdfs:label "ContactPair"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :targetPart ;
+            owl:someValuesFrom :dul_PhysicalObject ],
+        [ a owl:Restriction ;
+            owl:onProperty :toolPart ;
+            owl:someValuesFrom :dul_PhysicalObject ],
+        :dul_Description,
+        owl:Thing .
+
+:ContinuousState a owl:Class ;
+    rdfs:label "ContinuousState"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:ControlCycle a owl:Class ;
+    rdfs:label "ControlCycle"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:ControlProgram a owl:Class ;
+    rdfs:label "ControlProgram"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :mayCall ;
+            owl:someValuesFrom :ProposalMechanism ],
+        [ a owl:Restriction ;
+            owl:onProperty :givesInspectableStructureTo ;
+            owl:someValuesFrom :ExecutiveResponsibility ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasPart ;
+            owl:someValuesFrom :RuntimeReasonablePlan ],
+        [ a owl:Restriction ;
+            owl:onProperty :organizesControlOf ;
+            owl:someValuesFrom :ManipulationExecutive ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing .
+
+:CostFunction a owl:Class ;
+    rdfs:label "CostFunction"^^xsd:string ;
+    rdfs:subClassOf :dul_Description,
+        owl:Thing .
+
+:CouplingAlignedSubtree a owl:Class ;
+    rdfs:label "CouplingAlignedSubtree"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :simulatableUnder ;
+            owl:someValuesFrom :CouplingType ],
+        :SceneGraph,
+        owl:Thing .
+
+:CrackEvent a owl:Class ;
+    rdfs:label "CrackEvent"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :initiatesStateType ;
+            owl:someValuesFrom :CrackedContainerState ],
+        [ a owl:Restriction ;
+            owl:hasValue true ;
+            owl:onProperty :requiresHarderTool ],
+        [ a owl:Restriction ;
+            owl:onProperty :atContactPair ;
+            owl:someValuesFrom :ContactPair ],
+        :EventType,
+        owl:Thing .
+
+:CrackOrientation a owl:Class ;
+    rdfs:label "CrackOrientation"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:DegreeOfFreedom a owl:Class ;
+    rdfs:label "DegreeOfFreedom"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:DesignatorResolution a owl:Class ;
+    rdfs:label "DesignatorResolution"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:DesignatorTarget a owl:Class ;
+    rdfs:label "DesignatorTarget"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:Diagnosis a owl:Class ;
+    rdfs:label "Diagnosis"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:DiscreteModeStructure a owl:Class ;
+    rdfs:label "DiscreteModeStructure"^^xsd:string ;
+    rdfs:subClassOf :dul_Quality,
+        owl:Thing .
+
+:DistributionalPlausibility a owl:Class ;
+    rdfs:label "DistributionalPlausibility"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:DistributionalPlausible a owl:Class ;
+    rdfs:label "DistributionalPlausible"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:DualProcessTrace a owl:Class ;
+    rdfs:label "DualProcessTrace"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :recordsGroundingAndChecks ;
+            owl:someValuesFrom :CommitmentChecking ],
+        [ a owl:Restriction ;
+            owl:onProperty :recordsCommitment ;
+            owl:someValuesFrom :WarrantedExecutiveCommitment ],
+        [ a owl:Restriction ;
+            owl:onProperty :inspectableBy ;
+            owl:someValuesFrom :Critic ],
+        :AbstractEntity,
+        :EvidenceBearingTrace,
+        owl:Thing .
+
+:Embodiment a owl:Class ;
+    rdfs:label "Embodiment"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:EndEffector a owl:Class ;
+    rdfs:label "EndEffector"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :establishesContact ;
+            owl:someValuesFrom :Contact ],
+        :Link,
+        :PhysicalEntity,
+        owl:Thing .
+
+:EntityRelationQueryLanguage a owl:Class ;
+    rdfs:label "EntityRelationQueryLanguage"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :supportsNesting ;
+            owl:someValuesFrom :ComponentDescription ],
+        :AbstractEntity,
+        :dul_InformationObject,
+        owl:Thing ;
+    owl:disjointWith :KnowledgeGraph .
+
+:EnvironmentModel a owl:Class ;
+    rdfs:label "EnvironmentModel"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:Envisioning a owl:Class ;
+    rdfs:label "Envisioning"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :overParameterSpace ;
+            owl:someValuesFrom :ParameterSpace ],
+        [ a owl:Restriction ;
+            owl:onProperty :envisionedBy ;
+            owl:someValuesFrom :SemanticDigitalTwin ],
+        [ a owl:Restriction ;
+            owl:onProperty :composesSimulate ;
+            owl:someValuesFrom :RobotSimulator ],
+        [ a owl:Restriction ;
+            owl:onProperty :composesTranslate ;
+            owl:someValuesFrom :TranslationInterface ],
+        :dul_Description,
+        owl:Thing .
+
+:ExecutiveArchitecture a owl:Class ;
+    rdfs:label "ExecutiveArchitecture"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:ExecutiveCounterpart a owl:Class ;
+    rdfs:label "ExecutiveCounterpart"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:ExecutiveEstimate a owl:Class ;
+    rdfs:label "ExecutiveEstimate"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:ExecutiveResponsibility a owl:Class ;
+    rdfs:label "ExecutiveResponsibility"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:FilmThickness a owl:Class ;
+    rdfs:label "FilmThickness"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue true ;
+            owl:onProperty :thinsAsRadiusGrows ],
+        :dul_Region,
+        owl:Thing .
+
+:Fluent a owl:Class ;
+    rdfs:label "Fluent"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:ForceDynamicEvent a owl:Class ;
+    rdfs:label "ForceDynamicEvent"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :betweenRoleFillers ;
+            owl:someValuesFrom :RoleSlot ],
+        [ a owl:Restriction ;
+            owl:onProperty :involvesContact ;
+            owl:someValuesFrom :PhysicalContact ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasForceProfile ;
+            owl:someValuesFrom :ForceProfile ],
+        :dul_Event,
+        owl:Thing ;
+    owl:disjointWith :ForceDynamicSchema .
+
+:ForceInteraction a owl:Class ;
+    rdfs:label "ForceInteraction"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:ForceProfile a owl:Class ;
+    rdfs:label "ForceProfile"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:GenerativeDependencyStructure a owl:Class ;
+    rdfs:label "GenerativeDependencyStructure"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :partOf ;
+            owl:someValuesFrom :OperationalGrammar ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing .
+
+:GroundingField a owl:Class ;
+    rdfs:label "GroundingField"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:GroundingRecord a owl:Class ;
+    rdfs:label "GroundingRecord"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :hasField ;
+            owl:someValuesFrom :GroundingField ],
+        [ a owl:Restriction ;
+            owl:hasValue true ;
+            owl:onProperty :isRevisable ],
+        [ a owl:Restriction ;
+            owl:onProperty :producedBy ;
+            owl:someValuesFrom :TaskGrounding ],
+        :AbstractEntity,
+        :dul_InformationObject,
+        owl:Thing .
+
+:HierarchicalSceneStructure a owl:Class ;
+    rdfs:label "HierarchicalSceneStructure"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :hasNode ;
+            owl:someValuesFrom :SDTNode ],
+        :dul_InformationObject,
+        owl:Thing .
+
+:HybridBodyWorldState a owl:Class ;
+    rdfs:label "HybridBodyWorldState"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :evolvesBy ;
+            owl:someValuesFrom :ModeIndexedDynamics ],
+        :dul_Quality,
+        owl:Thing .
+
+:InertiaMatrix a owl:Class ;
+    rdfs:label "InertiaMatrix"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:InertialSpec a owl:Class ;
+    rdfs:label "InertialSpec"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:InstantaneousHorizon a owl:Class ;
+    rdfs:label "InstantaneousHorizon"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:InverseKinematics a owl:Class ;
+    rdfs:label "InverseKinematics"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :hasDomain ;
+            owl:someValuesFrom :TaskSpace ],
+        [ a owl:Restriction ;
+            owl:hasValue true ;
+            owl:onProperty :redundant ],
+        [ a owl:Restriction ;
+            owl:onProperty :inverseOf ;
+            owl:someValuesFrom :ForwardKinematics ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasCodomain ;
+            owl:someValuesFrom :ConfigurationSpace ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing ;
+    owl:disjointWith :ForwardKinematics .
+
+:JointElement a owl:Class ;
+    rdfs:label "JointElement"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:JointType a owl:Class ;
+    rdfs:label "JointType"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:KinematicJacobian a owl:Class ;
+    rdfs:label "KinematicJacobian"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :differentialOf ;
+            owl:someValuesFrom :ForwardKinematics ],
+        [ a owl:Restriction ;
+            owl:onProperty :indexedBy ;
+            owl:someValuesFrom :Configuration ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing .
+
+:KnowledgeQueryLanguage a owl:Class ;
+    rdfs:label "KnowledgeQueryLanguage"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :queriesOver ;
+            owl:someValuesFrom :KnowledgeGraph ],
+        [ a owl:Restriction ;
+            owl:hasValue "PrologSemantics"^^xsd:string ;
+            owl:onProperty :hasSemantics ],
+        :AbstractEntity,
+        :dul_InformationObject,
+        owl:Thing ;
+    owl:disjointWith :KnowledgeGraph .
+
+:LifecycleEvent a owl:Class ;
+    rdfs:label "LifecycleEvent"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:LinkElement a owl:Class ;
+    rdfs:label "LinkElement"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :hasInertial ;
+            owl:someValuesFrom :InertialSpec ],
+        :dul_InformationObject,
+        owl:Thing .
+
+:MaterialProperty a owl:Class ;
+    rdfs:label "MaterialProperty"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:MicrotheoryTemplate a owl:Class ;
+    rdfs:label "MicrotheoryTemplate"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :templateFor ;
+            owl:someValuesFrom :BodyWorldProcessMicrotheory ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing .
+
+:ModeIndexedDynamics a owl:Class ;
+    rdfs:label "ModeIndexedDynamics"^^xsd:string ;
+    rdfs:subClassOf :dul_Description,
+        owl:Thing .
+
+:NuisanceComponent a owl:Class ;
+    rdfs:label "NuisanceComponent"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:NuisanceModel a owl:Class ;
+    rdfs:label "NuisanceModel"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :definesRobustnessRange ;
+            owl:someValuesFrom :ProblemDomain ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing .
+
+:ObjectLevelRequirement a owl:Class ;
+    rdfs:label "ObjectLevelRequirement"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :checkedBy ;
+            owl:someValuesFrom :Critic ],
+        [ a owl:Restriction ;
+            owl:onProperty :halfOf ;
+            owl:someValuesFrom :BWSRelativeTaskSpecification ],
+        [ a owl:Restriction ;
+            owl:onProperty :constrains ;
+            owl:someValuesFrom :BodyWorldTrajectory ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing ;
+    owl:disjointWith :ReflectiveRequirement .
+
+:ObservationFunctions a owl:Class ;
+    rdfs:label "ObservationFunctions"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:OperationalizationCriterion a owl:Class ;
+    rdfs:label "OperationalizationCriterion"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:OptimizationBasedControl a owl:Class ;
+    rdfs:label "OptimizationBasedControl"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :minimizes ;
+            owl:someValuesFrom :CostFunction ],
+        [ a owl:Restriction ;
+            owl:onProperty :subjectTo ;
+            owl:someValuesFrom :DynamicModel ],
+        [ a owl:Restriction ;
+            owl:onProperty :subjectTo ;
+            owl:someValuesFrom :ConstraintSet ],
+        :AbstractEntity,
+        :RobotControlLaw,
+        owl:Thing .
+
+:Parameter a owl:Class ;
+    rdfs:label "Parameter"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:ParameterInterval a owl:Class ;
+    rdfs:label "ParameterInterval"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:Percept a owl:Class ;
+    rdfs:label "Percept"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:Performance a owl:Class ;
+    rdfs:label "Performance"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:PhysicalContact a owl:Class ;
+    rdfs:label "PhysicalContact"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:PhysicsModel a owl:Class ;
+    rdfs:label "PhysicsModel"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:ProbabilisticHybridProcessModel a owl:Class ;
+    rdfs:label "ProbabilisticHybridProcessModel"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :formalizes ;
+            owl:someValuesFrom :BodyWorldProcessMicrotheory ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing ;
+    owl:disjointWith :HybridBodyWorldState .
+
+:ProblemClassSpecificationTemplate a owl:Class ;
+    rdfs:label "ProblemClassSpecificationTemplate"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onClass :MasteryCriterion ;
+            owl:onProperty :requiresMasteryCriterion ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:onProperty :templateFor ;
+            owl:someValuesFrom :ManipulationProblemClass ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing .
+
+:ProcessInterpretation a owl:Class ;
+    rdfs:label "ProcessInterpretation"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :yields ;
+            owl:someValuesFrom :ProcessOccurrence ],
+        [ a owl:Restriction ;
+            owl:onProperty :appliesModel ;
+            owl:someValuesFrom :BodyWorldProcessMicrotheory ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing ;
+    owl:disjointWith :BodyWorldTrajectory .
+
+:ProcessModule a owl:Class ;
+    rdfs:label "ProcessModule"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:ProcessOccurrence a owl:Class ;
+    rdfs:label "ProcessOccurrence"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:ProposalNotCommitment a owl:Class ;
+    rdfs:label "ProposalNotCommitment"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:QualityFunctional a owl:Class ;
+    rdfs:label "QualityFunctional"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:QueryInterfaceOperation a owl:Class ;
+    rdfs:label "QueryInterfaceOperation"^^xsd:string ;
+    rdfs:subClassOf :dul_Action,
+        owl:Thing .
+
+:RWMSFamily a owl:Class ;
+    rdfs:label "RWMSFamily"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :makesFamilyRelative ;
+            owl:someValuesFrom :CompetenceClaim ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing .
+
+:RealizationForm a owl:Class ;
+    rdfs:label "RealizationForm"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:Reasoner a owl:Class ;
+    rdfs:label "Reasoner"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:ReflectiveRequirement a owl:Class ;
+    rdfs:label "ReflectiveRequirement"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :enables ;
+            owl:someValuesFrom :ResponsibleNonAccomplishment ],
+        [ a owl:Restriction ;
+            owl:onProperty :halfOf ;
+            owl:someValuesFrom :BWSRelativeTaskSpecification ],
+        [ a owl:Restriction ;
+            owl:onProperty :constrains ;
+            owl:someValuesFrom :ManipulationExecutive ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing ;
+    owl:disjointWith :ObjectLevelRequirement .
+
+:ReifiedTemporalEntity a owl:Class ;
+    rdfs:label "ReifiedTemporalEntity"^^xsd:string ;
+    rdfs:subClassOf :AbstractEntity,
+        :dul_InformationObject,
+        owl:Thing .
+
+:RelationEdge a owl:Class ;
+    rdfs:label "RelationEdge"^^xsd:string ;
+    rdfs:subClassOf :dul_Relation,
+        owl:Thing .
+
+:RelationFamily a owl:Class ;
+    rdfs:label "RelationFamily"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:RelationalGrammar a owl:Class ;
+    rdfs:label "RelationalGrammar"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :partOf ;
+            owl:someValuesFrom :OperationalGrammar ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasRelationFamily ;
+            owl:someValuesFrom :RelationFamily ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing .
+
+:Repair a owl:Class ;
+    rdfs:label "Repair"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :respondsTo ;
+            owl:someValuesFrom :FailureSignature ],
+        [ a owl:Restriction ;
+            owl:onProperty :transforms ;
+            owl:someValuesFrom :WarrantedExecutiveCommitment ],
+        [ a owl:Restriction ;
+            owl:onProperty :accountableVia ;
+            owl:someValuesFrom :EvidenceBearingTrace ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing .
+
+:RepresentationProcessCapabilityTriad a owl:Class ;
+    rdfs:label "RepresentationProcessCapabilityTriad"^^xsd:string ;
+    rdfs:subClassOf :AbstractEntity,
+        :dul_Description,
+        owl:Thing .
+
+:RepresentationalObligation a owl:Class ;
+    rdfs:label "RepresentationalObligation"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :derivedFrom ;
+            owl:someValuesFrom :ForceDynamicSchema ],
+        [ a owl:Restriction ;
+            owl:onProperty :obligates ;
+            owl:someValuesFrom :ManipulationExecutive ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing ;
+    owl:disjointWith :ForceDynamicSchema,
+        :dul_InformationObject .
+
+:ResolutionMode a owl:Class ;
+    rdfs:label "ResolutionMode"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:ResponsibleClaimScope a owl:Class ;
+    rdfs:label "ResponsibleClaimScope"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:Robot a owl:Class ;
+    rdfs:label "Robot"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onClass :ManipulationExecutive ;
+            owl:onProperty :hosts ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:onClass :RobotBody ;
+            owl:onProperty :hasProperPart ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        :PhysicalEntity,
+        :dul_PhysicalAgent,
+        owl:Thing ;
+    owl:disjointWith :ManipulationExecutive .
+
+:RobotSimulator a owl:Class ;
+    rdfs:label "RobotSimulator"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :hasPart ;
+            owl:someValuesFrom :PhysicsEngine ],
+        [ a owl:Restriction ;
+            owl:onProperty :realizes ;
+            owl:someValuesFrom :DigitalBodyWorldSystem ],
+        [ a owl:Restriction ;
+            owl:onProperty :loads ;
+            owl:someValuesFrom :SceneDescription ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasPart ;
+            owl:someValuesFrom :Renderer ],
+        :AbstractEntity,
+        :dul_InformationObject,
+        owl:Thing ;
+    owl:disjointWith :BodyWorldSystem,
+        :ManipulationExecutive .
+
+:RoleAssignmentLayer a owl:Class ;
+    rdfs:label "RoleAssignmentLayer"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:RuntimeReasonablePlan a owl:Class ;
+    rdfs:label "RuntimeReasonablePlan"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :partOf ;
+            owl:someValuesFrom :ControlProgram ],
+        [ a owl:Restriction ;
+            owl:hasValue "true, isInspectable value true"^^xsd:string ;
+            owl:onProperty :isExecutable ],
+        [ a owl:Restriction ;
+            owl:hasValue "true, isModifiableAtRuntime value true"^^xsd:string ;
+            owl:onProperty :isReasonableAtRuntime ],
+        [ a owl:Restriction ;
+            owl:onProperty :enablesLocalRepair ;
+            owl:someValuesFrom :Repair ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing .
+
+:SDTNode a owl:Class ;
+    rdfs:label "SDTNode"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:Scenario a owl:Class ;
+    rdfs:label "Scenario"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :isAbout ;
+            owl:someValuesFrom :BodyWorldSystem ],
+        :dul_Description,
+        owl:Thing .
+
+:SceneDescription a owl:Class ;
+    rdfs:label "SceneDescription"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :serializes ;
+            owl:someValuesFrom :SceneGraph ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasRobotSubtree ;
+            owl:someValuesFrom :RobotDescription ],
+        [ a owl:Restriction ;
+            owl:onProperty :referencesAsset ;
+            owl:someValuesFrom :SimulationAsset ],
+        :AbstractEntity,
+        :dul_InformationObject,
+        owl:Thing ;
+    owl:disjointWith :BodyWorldSystem .
+
+:SceneNode a owl:Class ;
+    rdfs:label "SceneNode"^^xsd:string ;
+    rdfs:subClassOf :dul_InformationObject,
+        owl:Thing .
+
+:ScopeCard a owl:Class ;
+    rdfs:label "ScopeCard"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:ScopeCondition a owl:Class ;
+    rdfs:label "ScopeCondition"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:SemanticReport a owl:Class ;
+    rdfs:label "SemanticReport"^^xsd:string ;
+    rdfs:subClassOf :dul_InformationObject,
+        owl:Thing .
+
+:SemanticTagging a owl:Class ;
+    rdfs:label "SemanticTagging"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :produces ;
+            owl:someValuesFrom :SemanticReport ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing .
+
+:SparqlQueryAnsweringModule a owl:Class ;
+    rdfs:label "SparqlQueryAnsweringModule"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:SpatialPose a owl:Class ;
+    rdfs:label "SpatialPose"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:StrengtheningCost a owl:Class ;
+    rdfs:label "StrengtheningCost"^^xsd:string ;
+    rdfs:subClassOf :AbstractEntity,
+        :dul_Description,
+        owl:Thing .
+
+:StrengtheningModule a owl:Class ;
+    rdfs:label "StrengtheningModule"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :hasCost ;
+            owl:someValuesFrom :StrengtheningCost ],
+        [ a owl:Restriction ;
+            owl:onProperty :unlocks ;
+            owl:someValuesFrom :Theorem ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing ;
+    owl:disjointWith :BodyWorldConstraint .
+
+:System1Output a owl:Class ;
+    rdfs:label "System1Output"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:TaskEnvironmentEmbodimentClass a owl:Class ;
+    rdfs:label "TaskEnvironmentEmbodimentClass"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :admitsEnvironmentModel ;
+            owl:someValuesFrom :EnvironmentModel ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasValidityInterval ;
+            owl:someValuesFrom :ParameterInterval ],
+        [ a owl:Restriction ;
+            owl:onClass :PhysicsModel ;
+            owl:onProperty :governedByPhysics ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:onProperty :admitsEmbodiment ;
+            owl:someValuesFrom :Embodiment ],
+        [ a owl:Restriction ;
+            owl:onProperty :admitsTaskType ;
+            owl:someValuesFrom :TaskType ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing ;
+    owl:disjointWith :ManipulationEpisode .
+
+:TaskRelativeClass a owl:Class ;
+    rdfs:label "TaskRelativeClass"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:TaskRequest a owl:Class ;
+    rdfs:label "TaskRequest"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:TaskScope a owl:Class ;
+    rdfs:label "TaskScope"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :generatesInstance ;
+            owl:someValuesFrom :TaskInstance ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing .
+
+:TaskType a owl:Class ;
+    rdfs:label "TaskType"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:TemporalPredicate a owl:Class ;
+    rdfs:label "TemporalPredicate"^^xsd:string ;
+    rdfs:subClassOf :AbstractEntity,
+        :dul_InformationObject,
+        owl:Thing .
+
+:TerminalDisposition a owl:Class ;
+    rdfs:label "TerminalDisposition"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:TranslationInterface a owl:Class ;
+    rdfs:label "TranslationInterface"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue true ;
+            owl:onProperty :isCommitmentSensitive ],
+        [ a owl:Restriction ;
+            owl:onProperty :interfaceOf ;
+            owl:someValuesFrom :DualProcessManipulationExecutive ],
+        [ a owl:Restriction ;
+            owl:onProperty :mapsFrom ;
+            owl:someValuesFrom :System1Output ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing .
+
+:Triple a owl:Class ;
+    rdfs:label "Triple"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:USDOntology a owl:Class ;
+    rdfs:label "USDOntology"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue "USD"^^xsd:string ;
+            owl:onProperty :modelsLanguage ],
+        :dul_InformationObject,
+        owl:Thing .
+
+:Variable a owl:Class ;
+    rdfs:label "Variable"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:VisualGeometry a owl:Class ;
+    rdfs:label "VisualGeometry"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :consumedBy ;
+            owl:someValuesFrom :Renderer ],
+        :SimulationAsset,
+        owl:Thing .
+
+:aboutSystemFamily a owl:ObjectProperty .
+
+:accountableVia a owl:ObjectProperty .
+
+:actsOnState a owl:ObjectProperty .
+
+:actuatedBy a owl:ObjectProperty .
+
+:actuates a owl:ObjectProperty .
+
+:admitsEmbodiment a owl:ObjectProperty .
+
+:admitsEnvironmentModel a owl:ObjectProperty .
+
+:admitsTaskType a owl:ObjectProperty .
+
+:alongDimension a owl:ObjectProperty .
+
+:answersQuestion a owl:ObjectProperty .
+
+:appliesCritic a owl:ObjectProperty .
+
+:appliesFirstOf a owl:ObjectProperty .
+
+:appliesModel a owl:ObjectProperty .
+
+:appliesStep a owl:ObjectProperty .
+
+:appliesTo a owl:ObjectProperty .
+
+:architectureOf a owl:ObjectProperty .
+
+:arrestedByEvent a owl:ObjectProperty .
+
+:assessedAgainst a owl:ObjectProperty .
+
+:assesses a owl:ObjectProperty .
+
+:assignsClass a owl:ObjectProperty .
+
+:atContactPair a owl:ObjectProperty .
+
+:atDegree a owl:ObjectProperty .
+
+:betweenRoleFillers a owl:ObjectProperty .
+
+:boundaryTaskRelative a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:calls a owl:ObjectProperty .
+
+:characterizes a owl:ObjectProperty .
+
+:checkedBy a owl:ObjectProperty .
+
+:claimsOver a owl:ObjectProperty .
+
+:classifiedBy a owl:ObjectProperty .
+
+:classifies a owl:ObjectProperty .
+
+:collectedInto a owl:ObjectProperty .
+
+:composesSimulate a owl:ObjectProperty .
+
+:composesTranslate a owl:ObjectProperty .
+
+:configurationSpaceOf a owl:ObjectProperty .
+
+:conformsToScope a owl:ObjectProperty .
+
+:connectedBy a owl:ObjectProperty .
+
+:connects a owl:ObjectProperty .
+
+:consequentialVia a owl:ObjectProperty .
+
+:constructedBy a owl:ObjectProperty .
+
+:controls a owl:ObjectProperty .
+
+:definedBy a owl:ObjectProperty .
+
+:definesConditionOn a owl:ObjectProperty .
+
+:definesMap a owl:ObjectProperty .
+
+:definesRobustnessRange a owl:ObjectProperty .
+
+:derivedFrom a owl:ObjectProperty .
+
+:describes a owl:ObjectProperty .
+
+:detectedBy a owl:ObjectProperty .
+
+:differentialOf a owl:ObjectProperty .
+
+:directedBy a owl:ObjectProperty .
+
+:discharges a owl:ObjectProperty .
+
+:distinctFrom a owl:ObjectProperty .
+
+:drawnFrom a owl:ObjectProperty .
+
+:drivenBy a owl:ObjectProperty .
+
+:dul_Action a owl:Class ;
+    rdfs:label "dul:Action"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:dul_Agent a owl:Class ;
+    rdfs:label "dul:Agent"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:dul_PhysicalAgent a owl:Class ;
+    rdfs:label "dul:PhysicalAgent"^^xsd:string ;
+    rdfs:subClassOf :PhysicalEntity,
+        owl:Thing .
+
+:dul_Relation a owl:Class ;
+    rdfs:label "dul:Relation"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:enablesLocalRepair a owl:ObjectProperty .
+
+:enumeratedBy a owl:ObjectProperty .
+
+:envisionedBy a owl:ObjectProperty .
+
+:establishesContact a owl:ObjectProperty .
+
+:evidenceBaseFor a owl:ObjectProperty .
+
+:evolvesBy a owl:ObjectProperty .
+
+:executedBy a owl:ObjectProperty .
+
+:expressesTaskAs a owl:ObjectProperty .
+
+:formalizedBy a owl:ObjectProperty .
+
+:formalizes a owl:ObjectProperty .
+
+:forwardBranching a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:freeSpace a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:generatesInstance a owl:ObjectProperty .
+
+:generatesTrace a owl:ObjectProperty .
+
+:generatorAgnostic a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:givesInspectableStructureTo a owl:ObjectProperty .
+
+:governedByPhysics a owl:ObjectProperty .
+
+:governsClaim a owl:ObjectProperty .
+
+:grounds a owl:ObjectProperty .
+
+:hasBodyWorldSystem a owl:ObjectProperty .
+
+:hasCommitmentRecord a owl:ObjectProperty .
+
+:hasContinuousState a owl:ObjectProperty .
+
+:hasCost a owl:ObjectProperty .
+
+:hasCoupling a owl:ObjectProperty .
+
+:hasCouplingType a owl:ObjectProperty .
+
+:hasCoverageTarget a owl:ObjectProperty .
+
+:hasCrackOrientation a owl:ObjectProperty .
+
+:hasCriticSet a owl:ObjectProperty .
+
+:hasDependencyStructure a owl:ObjectProperty .
+
+:hasDifferential a owl:ObjectProperty .
+
+:hasDiscreteMode a owl:ObjectProperty .
+
+:hasEnd a owl:ObjectProperty .
+
+:hasEndEffector a owl:ObjectProperty .
+
+:hasExecutiveEstimate a owl:ObjectProperty .
+
+:hasExpectedObservation a owl:ObjectProperty .
+
+:hasField a owl:ObjectProperty .
+
+:hasFilmThickness a owl:ObjectProperty .
+
+:hasForceProfile a owl:ObjectProperty .
+
+:hasInertiaTerm a owl:ObjectProperty .
+
+:hasInertial a owl:ObjectProperty .
+
+:hasJointElement a owl:ObjectProperty .
+
+:hasJointType a owl:ObjectProperty .
+
+:hasLifecycleEvents a owl:ObjectProperty .
+
+:hasLink a owl:ObjectProperty .
+
+:hasLinkElement a owl:ObjectProperty .
+
+:hasMasteryCriterion a owl:ObjectProperty .
+
+:hasNodeStructure a owl:ObjectProperty .
+
+:hasNuisanceCondition a owl:ObjectProperty .
+
+:hasNuisanceModel a owl:ObjectProperty .
+
+:hasPhysicalCore a owl:ObjectProperty .
+
+:hasPolicy a owl:ObjectProperty .
+
+:hasPose a owl:ObjectProperty .
+
+:hasPredicate a owl:ObjectProperty .
+
+:hasPredictor a owl:ObjectProperty .
+
+:hasPrimaryActivity a owl:ObjectProperty .
+
+:hasProperty a owl:ObjectProperty .
+
+:hasQualityFunctional a owl:ObjectProperty .
+
+:hasRWMSFamily a owl:ObjectProperty .
+
+:hasRecording a owl:ObjectProperty .
+
+:hasRelationEdge a owl:ObjectProperty .
+
+:hasRelationFamily a owl:ObjectProperty .
+
+:hasRelationalGrammar a owl:ObjectProperty .
+
+:hasRequest a owl:ObjectProperty .
+
+:hasRobotSubtree a owl:ObjectProperty .
+
+:hasRoleAssignmentLayer a owl:ObjectProperty .
+
+:hasRoleSlot a owl:ObjectProperty .
+
+:hasScope a owl:ObjectProperty .
+
+:hasScopeCard a owl:ObjectProperty .
+
+:hasSemantics a owl:DatatypeProperty .
+
+:hasSensor a owl:ObjectProperty .
+
+:hasSpreadRadius a owl:ObjectProperty .
+
+:hasStart a owl:ObjectProperty .
+
+:hasStructuralCore a owl:ObjectProperty .
+
+:hasTaskScope a owl:ObjectProperty .
+
+:hasTaskSpecification a owl:ObjectProperty .
+
+:hasTemplate a owl:ObjectProperty .
+
+:hasTerminalDisposition a owl:ObjectProperty .
+
+:hasTopology a owl:DatatypeProperty .
+
+:hasTrace a owl:ObjectProperty .
+
+:hasTriple a owl:ObjectProperty .
+
+:hasValidityInterval a owl:ObjectProperty .
+
+:hasVerdictComponent a owl:ObjectProperty .
+
+:heldBy a owl:ObjectProperty .
+
+:holdsOver a owl:ObjectProperty .
+
+:hosts a owl:ObjectProperty .
+
+:implementationOf a owl:ObjectProperty .
+
+:indexedBy a owl:ObjectProperty .
+
+:initiatedByEvent a owl:ObjectProperty .
+
+:inspectableBy a owl:ObjectProperty .
+
+:instantiates a owl:ObjectProperty .
+
+:integratedInto a owl:ObjectProperty .
+
+:interfaceOf a owl:ObjectProperty .
+
+:interprets a owl:ObjectProperty .
+
+:interpretsVia a owl:ObjectProperty .
+
+:inverseOf a owl:ObjectProperty .
+
+:involvesContact a owl:ObjectProperty .
+
+:isAccountable a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:isArchitectureNeutral a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:isAssessmentInput a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:isBeliefState a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:isBounded a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:isClosedLoop a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:isCommitmentSensitive a owl:DatatypeProperty .
+
+:isCriticAssigned a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:isCriticRelative a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:isDataStructureRealization a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:isDispositional a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:isEventDescription a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:isExecutable a owl:DatatypeProperty .
+
+:isExecutiveIndependent a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:isExplicit a owl:DatatypeProperty .
+
+:isGenerator a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:isGroundTruth a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:isGrounded a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:isGroundedInSimulation a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:isHierarchical a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:isModelOf a owl:ObjectProperty .
+
+:isPartial a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:isPhysical a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:isRWMSComponent a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:isRWMSPart a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:isRawLog a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:isReasonableAtRuntime a owl:DatatypeProperty .
+
+:isRunOf a owl:ObjectProperty .
+
+:isScoped a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:isSpecification a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:lazy a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:licensedBySingleEpisode a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:loads a owl:ObjectProperty .
+
+:logsTo a owl:ObjectProperty .
+
+:maintainsConditionFor a owl:ObjectProperty .
+
+:makesConcrete a owl:ObjectProperty .
+
+:makesFamilyRelative a owl:ObjectProperty .
+
+:mapsFrom a owl:ObjectProperty .
+
+:maximal a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:mayCall a owl:ObjectProperty .
+
+:meets a owl:ObjectProperty .
+
+:memberOf a owl:ObjectProperty .
+
+:minimizes a owl:ObjectProperty .
+
+:mirrors a owl:ObjectProperty .
+
+:modelsLanguage a owl:DatatypeProperty .
+
+:monitorFor a owl:ObjectProperty .
+
+:mountedOn a owl:ObjectProperty .
+
+:nearActionInterface a owl:DatatypeProperty .
+
+:obligates a owl:ObjectProperty .
+
+:occursOver a owl:ObjectProperty .
+
+:ofEventType a owl:ObjectProperty .
+
+:onFlatObject a owl:ObjectProperty .
+
+:operationalizes a owl:ObjectProperty .
+
+:optimizes a owl:ObjectProperty .
+
+:organizesControlOf a owl:ObjectProperty .
+
+:overInterval a owl:ObjectProperty .
+
+:overParameterSpace a owl:ObjectProperty .
+
+:overProblemFamily a owl:ObjectProperty .
+
+:partitionedInto a owl:ObjectProperty .
+
+:physicallyTypedBy a owl:ObjectProperty .
+
+:pipelineOf a owl:ObjectProperty .
+
+:presupposes a owl:ObjectProperty .
+
+:problemIsProperPart a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:producedBy a owl:ObjectProperty .
+
+:producedByEnvisioning a owl:ObjectProperty .
+
+:producesRecordIn a owl:ObjectProperty .
+
+:producesSynthetic a owl:ObjectProperty .
+
+:producesVerdict a owl:ObjectProperty .
+
+:projectionOfBranch a owl:ObjectProperty .
+
+:providesDOF a owl:ObjectProperty .
+
+:queriesOver a owl:ObjectProperty .
+
+:reads a owl:ObjectProperty .
+
+:realizationOf a owl:ObjectProperty .
+
+:realizedAs a owl:ObjectProperty .
+
+:realizesVia a owl:ObjectProperty .
+
+:reasonsOver a owl:ObjectProperty .
+
+:recordsCommitment a owl:ObjectProperty .
+
+:recordsGroundingAndChecks a owl:ObjectProperty .
+
+:redundant a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:references a owl:ObjectProperty .
+
+:referencesAsset a owl:ObjectProperty .
+
+:reifies a owl:ObjectProperty .
+
+:relativeToProblemFamily a owl:ObjectProperty .
+
+:relativeToScenario a owl:ObjectProperty .
+
+:representsSelfStateOf a owl:ObjectProperty .
+
+:requiresCounterpart a owl:ObjectProperty .
+
+:requiresDeclaredScope a owl:ObjectProperty .
+
+:requiresHarderTool a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:requiresMasteryCriterion a owl:ObjectProperty .
+
+:resolvesEach a owl:ObjectProperty .
+
+:resolvesTo a owl:ObjectProperty .
+
+:resolvesToState a owl:ObjectProperty .
+
+:resolvesVia a owl:ObjectProperty .
+
+:respondsTo a owl:ObjectProperty .
+
+:satisfies a owl:ObjectProperty .
+
+:simulatableUnder a owl:ObjectProperty .
+
+:singleValued a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:solvesFor a owl:ObjectProperty .
+
+:soma_Action a owl:Class ;
+    rdfs:label "soma:Action"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:specifiedBy a owl:ObjectProperty .
+
+:specifies a owl:ObjectProperty .
+
+:strengthens a owl:ObjectProperty .
+
+:supportsNesting a owl:ObjectProperty .
+
+:supportsOperation a owl:ObjectProperty .
+
+:system2 a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:targetPart a owl:ObjectProperty .
+
+:templateOf a owl:ObjectProperty .
+
+:thinsAsRadiusGrows a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:toolPart a owl:ObjectProperty .
+
+:total a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:totallyOrders a owl:ObjectProperty .
+
+:transforms a owl:ObjectProperty .
+
+:translatedFrom a owl:ObjectProperty .
+
+:triggers a owl:ObjectProperty .
+
+:underspecified a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:usesPredicateFrom a owl:ObjectProperty .
+
+:vocabularyFor a owl:ObjectProperty .
+
+:ActuatorInput a owl:Class ;
+    rdfs:label "ActuatorInput"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:ClosedContainerState a owl:Class ;
+    rdfs:label "ClosedContainerState"^^xsd:string ;
+    rdfs:subClassOf :ContainerClosureState,
+        owl:Thing .
+
+:CommitmentChecking a owl:Class ;
+    rdfs:label "CommitmentChecking"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :uses ;
+            owl:someValuesFrom :BodyWorldProcessMicrotheory ],
+        [ a owl:Restriction ;
+            owl:onProperty :uses ;
+            owl:someValuesFrom :ActionRelatedConcept ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing ;
+    owl:disjointWith :WarrantedExecutiveCommitment .
+
+:ConfigurationSpace a owl:Class ;
+    rdfs:label "ConfigurationSpace"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :configurationSpaceOf ;
+            owl:someValuesFrom :RobotBody ],
+        :AbstractEntity,
+        :dul_Region,
+        owl:Thing ;
+    owl:disjointWith :dul_PhysicalObject .
+
+:ConstraintSet a owl:Class ;
+    rdfs:label "ConstraintSet"^^xsd:string ;
+    rdfs:subClassOf :dul_Description,
+        owl:Thing .
+
+:Contact a owl:Class ;
+    rdfs:label "Contact"^^xsd:string ;
+    rdfs:subClassOf :PhysicalEntity,
+        owl:Thing .
+
+:ContainerClosureState a owl:Class ;
+    rdfs:label "ContainerClosureState"^^xsd:string ;
+    rdfs:subClassOf :FluentType,
+        owl:Thing .
+
+:ControlSequence a owl:Class ;
+    rdfs:label "ControlSequence"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:CrackedContainerState a owl:Class ;
+    rdfs:label "CrackedContainerState"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :hasCrackOrientation ;
+            owl:someValuesFrom :CrackOrientation ],
+        [ a owl:Restriction ;
+            owl:onProperty :resolvesToState ;
+            owl:someValuesFrom :OpenContainerState ],
+        [ a owl:Restriction ;
+            owl:onProperty :initiatedByEvent ;
+            owl:someValuesFrom :CrackEvent ],
+        :ClosedContainerState,
+        owl:Thing .
+
+:DualProcessManipulationExecutive a owl:Class ;
+    rdfs:label "DualProcessManipulationExecutive"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :architectureOf ;
+            owl:someValuesFrom :ManipulationExecutive ],
+        [ a owl:Restriction ;
+            owl:onProperty :logsTo ;
+            owl:someValuesFrom :DualProcessTrace ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing .
+
+:ExecutablePrediction a owl:Class ;
+    rdfs:label "ExecutablePrediction"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:FailureSignature a owl:Class ;
+    rdfs:label "FailureSignature"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :enumeratedBy ;
+            owl:someValuesFrom :BodyWorldProcessMicrotheory ],
+        [ a owl:Restriction ;
+            owl:onProperty :detectedBy ;
+            owl:someValuesFrom :ProcessMonitor ],
+        [ a owl:Restriction ;
+            owl:onProperty :triggers ;
+            owl:someValuesFrom :Diagnosis ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing ;
+    owl:disjointWith :ProcessMonitor .
+
+:KRRHypothesis a owl:Class ;
+    rdfs:label "KRRHypothesis"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:ManipulationExecutiveOperatingSystem a owl:Class ;
+    rdfs:label "ManipulationExecutiveOperatingSystem"^^xsd:string ;
+    rdfs:subClassOf :dul_Description,
+        owl:Thing .
+
+:Motor a owl:Class ;
+    rdfs:label "Motor"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :partOf ;
+            owl:someValuesFrom :RobotBody ],
+        [ a owl:Restriction ;
+            owl:onProperty :actuates ;
+            owl:someValuesFrom :Joint ],
+        :PhysicalEntity,
+        :dul_PhysicalObject,
+        owl:Thing ;
+    owl:disjointWith :Joint,
+        :Sensor .
+
+:Observation a owl:Class ;
+    rdfs:label "Observation"^^xsd:string ;
+    rdfs:subClassOf :AbstractEntity,
+        owl:Thing .
+
+:OpenContainerState a owl:Class ;
+    rdfs:label "OpenContainerState"^^xsd:string ;
+    rdfs:subClassOf :ContainerClosureState,
+        owl:Thing ;
+    owl:disjointWith :ClosedContainerState .
+
+:OperationalGrammar a owl:Class ;
+    rdfs:label "OperationalGrammar"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :hasDependencyStructure ;
+            owl:someValuesFrom :GenerativeDependencyStructure ],
+        [ a owl:Restriction ;
+            owl:onProperty :presupposes ;
+            owl:someValuesFrom :KRRHypothesis ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasRelationalGrammar ;
+            owl:someValuesFrom :RelationalGrammar ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing .
+
+:ParameterSpace a owl:Class ;
+    rdfs:label "ParameterSpace"^^xsd:string ;
+    rdfs:subClassOf :dul_Region,
+        owl:Thing .
+
+:PhysicsEngine a owl:Class ;
+    rdfs:label "PhysicsEngine"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :realizes ;
+            owl:someValuesFrom :ExecutablePrediction ],
+        [ a owl:Restriction ;
+            owl:onProperty :consumes ;
+            owl:someValuesFrom :CollisionGeometry ],
+        :AbstractEntity,
+        :dul_InformationObject,
+        owl:Thing ;
+    owl:disjointWith :BodyWorldSystem .
+
+:PrimaryActivity a owl:Class ;
+    rdfs:label "PrimaryActivity"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:ProcessMonitor a owl:Class ;
+    rdfs:label "ProcessMonitor"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :producesRecordIn ;
+            owl:someValuesFrom :EvidenceBearingTrace ],
+        [ a owl:Restriction ;
+            owl:onProperty :monitorFor ;
+            owl:someValuesFrom :BodyWorldProcessMicrotheory ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing ;
+    owl:disjointWith :FailureSignature .
+
+:ProposalMechanism a owl:Class ;
+    rdfs:label "ProposalMechanism"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:Renderer a owl:Class ;
+    rdfs:label "Renderer"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :consumes ;
+            owl:someValuesFrom :VisualGeometry ],
+        [ a owl:Restriction ;
+            owl:onProperty :realizes ;
+            owl:someValuesFrom :ExpectedObservation ],
+        [ a owl:Restriction ;
+            owl:onProperty :instantiates ;
+            owl:someValuesFrom :ObservationFunctions ],
+        :AbstractEntity,
+        :dul_InformationObject,
+        owl:Thing ;
+    owl:disjointWith :Observation .
+
+:ResponsibleNonAccomplishment a owl:Class ;
+    rdfs:label "ResponsibleNonAccomplishment"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:RobotControlLaw a owl:Class ;
+    rdfs:label "RobotControlLaw"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :directedBy ;
+            owl:someValuesFrom :ManipulationControlProgram ],
+        [ a owl:Restriction ;
+            owl:onProperty :uses ;
+            owl:someValuesFrom :DynamicModel ],
+        [ a owl:Restriction ;
+            owl:onProperty :realizes ;
+            owl:someValuesFrom :BodyMotion ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing ;
+    owl:disjointWith :BodyMotion,
+        :ManipulationControlProgram .
+
+:RobotDescription a owl:Class ;
+    rdfs:label "RobotDescription"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :serializes ;
+            owl:someValuesFrom :DynamicModel ],
+        [ a owl:Restriction ;
+            owl:onProperty :describes ;
+            owl:someValuesFrom :RobotBody ],
+        [ a owl:Restriction ;
+            owl:onProperty :serializes ;
+            owl:someValuesFrom :KinematicModel ],
+        :AbstractEntity,
+        :dul_InformationObject,
+        owl:Thing ;
+    owl:disjointWith :RobotBody .
+
+:RoleSlot a owl:Class ;
+    rdfs:label "RoleSlot"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :physicallyTypedBy ;
+            owl:someValuesFrom :MaterialProperty ],
+        :dul_Concept,
+        owl:Thing .
+
+:SemanticDigitalTwin a owl:Class ;
+    rdfs:label "SemanticDigitalTwin"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :isAbout ;
+            owl:someValuesFrom :BodyWorldSystem ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasNodeStructure ;
+            owl:someValuesFrom :HierarchicalSceneStructure ],
+        [ a owl:Restriction ;
+            owl:onProperty :supportsOperation ;
+            owl:someValuesFrom :QueryInterfaceOperation ],
+        [ a owl:Restriction ;
+            owl:hasValue true ;
+            owl:onProperty :isBeliefState ],
+        [ a owl:Restriction ;
+            owl:hasValue false ;
+            owl:onProperty :isGroundTruth ],
+        :AbstractEntity,
+        :dul_InformationObject,
+        owl:Thing ;
+    owl:disjointWith :BodyWorldSystem .
+
+:SimulationLog a owl:Class ;
+    rdfs:label "SimulationLog"^^xsd:string ;
+    rdfs:subClassOf :dul_InformationObject,
+        owl:Thing .
+
+:SomaOntology a owl:Class ;
+    rdfs:label "SomaOntology"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:SpreadRadius a owl:Class ;
+    rdfs:label "SpreadRadius"^^xsd:string ;
+    rdfs:subClassOf :dul_Region,
+        owl:Thing .
+
+:TaskGrounding a owl:Class ;
+    rdfs:label "TaskGrounding"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :grounds ;
+            owl:someValuesFrom :TaskInstance ],
+        [ a owl:Restriction ;
+            owl:onProperty :relativeTo ;
+            owl:someValuesFrom :BodyWorldSystem ],
+        [ a owl:Restriction ;
+            owl:onProperty :yields ;
+            owl:someValuesFrom :BWSRelativeTaskSpecification ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing .
+
+:TaskInstance a owl:Class ;
+    rdfs:label "TaskInstance"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue true ;
+            owl:onProperty :underspecified ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing .
+
+:TaskSpace a owl:Class ;
+    rdfs:label "TaskSpace"^^xsd:string ;
+    rdfs:subClassOf :dul_Region,
+        owl:Thing .
+
+:Theorem a owl:Class ;
+    rdfs:label "Theorem"^^xsd:string ;
+    rdfs:subClassOf :AbstractEntity,
+        :dul_Description,
+        owl:Thing .
+
+:URDF a owl:Class ;
+    rdfs:label "URDF"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue "Tree"^^xsd:string ;
+            owl:onProperty :hasTopology ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasJointElement ;
+            owl:someValuesFrom :JointElement ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasLinkElement ;
+            owl:someValuesFrom :LinkElement ],
+        :AbstractEntity,
+        :RobotDescription,
+        owl:Thing .
+
+:WorldPhysicalEntity a owl:Class ;
+    rdfs:label "WorldPhysicalEntity"^^xsd:string ;
+    rdfs:subClassOf :dul_PhysicalObject,
+        owl:Thing .
+
+:consumedBy a owl:ObjectProperty .
+
+:contains a owl:ObjectProperty .
+
+:dul_Concept a owl:Class ;
+    rdfs:label "dul:Concept"^^xsd:string ;
+    rdfs:subClassOf :AbstractEntity,
+        owl:Thing .
+
+:dul_Situation a owl:Class ;
+    rdfs:label "dul:Situation"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:enables a owl:ObjectProperty .
+
+:generatedBy a owl:ObjectProperty .
+
+:groundedIn a owl:ObjectProperty .
+
+:halfOf a owl:ObjectProperty .
+
+:hasCodomain a owl:ObjectProperty .
+
+:hasDomain a owl:ObjectProperty .
+
+:hasGoal a owl:ObjectProperty .
+
+:hasJoint a owl:ObjectProperty .
+
+:hasNode a owl:ObjectProperty .
+
+:hasParameter a owl:ObjectProperty .
+
+:homogeneous a owl:DatatypeProperty,
+        owl:FunctionalProperty .
+
+:initiatesStateType a owl:ObjectProperty .
+
+:produces a owl:ObjectProperty .
+
+:resourceFor a owl:ObjectProperty .
+
+:subjectTo a owl:ObjectProperty .
+
+:templateFor a owl:ObjectProperty .
+
+:unlocks a owl:ObjectProperty .
+
+:usesModel a owl:ObjectProperty .
+
+:yields a owl:ObjectProperty .
+
+:ActionToken a owl:Class ;
+    rdfs:label "ActionToken"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:BodyWorldConstraint a owl:Class ;
+    rdfs:label "BodyWorldConstraint"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :unlocks ;
+            owl:someValuesFrom :Theorem ],
+        [ a owl:Restriction ;
+            owl:onProperty :constrains ;
+            owl:someValuesFrom :BodyWorldSystem ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing ;
+    owl:disjointWith :StrengtheningModule .
+
+:DigitalBodyWorldSystem a owl:Class ;
+    rdfs:label "DigitalBodyWorldSystem"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :hasPredictor ;
+            owl:someValuesFrom :ExecutablePrediction ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasStructuralCore ;
+            owl:someValuesFrom :SceneGraph ],
+        [ a owl:Restriction ;
+            owl:hasValue true ;
+            owl:onProperty :isSpecification ],
+        [ a owl:Restriction ;
+            owl:hasValue false ;
+            owl:onProperty :isPhysical ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasExpectedObservation ;
+            owl:someValuesFrom :ExpectedObservation ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasScopeCard ;
+            owl:someValuesFrom :ScopeCard ],
+        [ a owl:Restriction ;
+            owl:onProperty :isModelOf ;
+            owl:someValuesFrom :BodyWorldSystem ],
+        :dul_InformationObject,
+        owl:Thing ;
+    owl:disjointWith :BodyWorldSystem .
+
+:ExecutiveProperty a owl:Class ;
+    rdfs:label "ExecutiveProperty"^^xsd:string ;
+    rdfs:subClassOf :AbstractEntity,
+        :dul_Description,
+        owl:Thing .
+
+:ExpectedObservation a owl:Class ;
+    rdfs:label "ExpectedObservation"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:KinematicModel a owl:Class ;
+    rdfs:label "KinematicModel"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :modelOf ;
+            owl:someValuesFrom :RobotBody ],
+        [ a owl:Restriction ;
+            owl:onProperty :definesMap ;
+            owl:someValuesFrom :ForwardKinematics ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasDifferential ;
+            owl:someValuesFrom :KinematicJacobian ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing ;
+    owl:disjointWith :DynamicModel .
+
+:MasteryCriterion a owl:Class ;
+    rdfs:label "MasteryCriterion"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:Recording a owl:Class ;
+    rdfs:label "Recording"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue true ;
+            owl:onProperty :isPartial ],
+        [ a owl:Restriction ;
+            owl:onProperty :isAbout ;
+            owl:someValuesFrom :ManipulationEpisode ],
+        :dul_InformationObject,
+        owl:Thing ;
+    owl:disjointWith :EvidenceBearingTrace,
+        :ManipulationEpisode .
+
+:SimulationAsset a owl:Class ;
+    rdfs:label "SimulationAsset"^^xsd:string ;
+    rdfs:subClassOf :AbstractEntity,
+        :dul_InformationObject,
+        owl:Thing .
+
+:SpreadArrestEvent a owl:Class ;
+    rdfs:label "SpreadArrestEvent"^^xsd:string ;
+    rdfs:subClassOf :EventType,
+        owl:Thing .
+
+:TimeInstant a owl:Class ;
+    rdfs:label "TimeInstant"^^xsd:string ;
+    rdfs:subClassOf :AbstractEntity,
+        :dul_Region,
+        owl:Thing .
+
+:VerdictComponent a owl:Class ;
+    rdfs:label "VerdictComponent"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :groundedIn ;
+            owl:someValuesFrom :EvidenceBearingTrace ],
+        [ a owl:Restriction ;
+            owl:onClass :ManipulationEpisode ;
+            owl:onProperty :assesses ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:onClass :AccountableDimension ;
+            owl:onProperty :alongDimension ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:hasValue true ;
+            owl:onProperty :isCriticAssigned ],
+        :AbstractEntity,
+        :dul_Quality,
+        owl:Thing .
+
+:consumes a owl:ObjectProperty .
+
+:dul_Event a owl:Class ;
+    rdfs:label "dul:Event"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:governedBy a owl:DatatypeProperty .
+
+:hasPart a owl:ObjectProperty .
+
+:isRevisable a owl:DatatypeProperty .
+
+:modelOf a owl:ObjectProperty .
+
+:relativeTo a owl:ObjectProperty .
+
+:serializes a owl:ObjectProperty .
+
+:BWSRelativeTaskSpecification a owl:Class ;
+    rdfs:label "BWSRelativeTaskSpecification"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:BodyMotion a owl:Class ;
+    rdfs:label "BodyMotion"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue true ;
+            owl:onProperty :generatorAgnostic ],
+        [ a owl:Restriction ;
+            owl:onProperty :generatedBy ;
+            owl:someValuesFrom :RobotBody ],
+        [ a owl:Restriction ;
+            owl:hasValue true ;
+            owl:onProperty :freeSpace ],
+        [ a owl:Restriction ;
+            owl:onProperty :drivenBy ;
+            owl:someValuesFrom :ActuatorInput ],
+        [ a owl:Restriction ;
+            owl:maxQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+            owl:onClass :Contact ;
+            owl:onProperty :consequentialVia ],
+        :PhysicalEntity,
+        :dul_Event,
+        owl:Thing ;
+    owl:disjointWith :ActionToken,
+        :DistributionalPlausible .
+
+:BodyWorldTrajectory a owl:Class ;
+    rdfs:label "BodyWorldTrajectory"^^xsd:string ;
+    rdfs:subClassOf :dul_Event,
+        owl:Thing .
+
+:Critic a owl:Class ;
+    rdfs:label "Critic"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:DynamicModel a owl:Class ;
+    rdfs:label "DynamicModel"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onClass :InertiaMatrix ;
+            owl:onProperty :hasInertiaTerm ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:onProperty :modelOf ;
+            owl:someValuesFrom :RobotBody ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing ;
+    owl:disjointWith :KinematicModel .
+
+:ForwardKinematics a owl:Class ;
+    rdfs:label "ForwardKinematics"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue true ;
+            owl:onProperty :total ],
+        [ a owl:Restriction ;
+            owl:hasValue true ;
+            owl:onProperty :singleValued ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasCodomain ;
+            owl:someValuesFrom :TaskSpace ],
+        [ a owl:Restriction ;
+            owl:onProperty :definedBy ;
+            owl:someValuesFrom :KinematicModel ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasDomain ;
+            owl:someValuesFrom :ConfigurationSpace ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing ;
+    owl:disjointWith :InverseKinematics .
+
+:KnowledgeGraph a owl:Class ;
+    rdfs:label "KnowledgeGraph"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :groundedIn ;
+            owl:someValuesFrom :SomaOntology ],
+        [ a owl:Restriction ;
+            owl:onProperty :isAbout ;
+            owl:someValuesFrom :BodyWorldSystem ],
+        [ a owl:Restriction ;
+            owl:onProperty :classifiedBy ;
+            owl:someValuesFrom :Reasoner ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasTriple ;
+            owl:someValuesFrom :Triple ],
+        :AbstractEntity,
+        :dul_InformationObject,
+        owl:Thing ;
+    owl:disjointWith :BodyWorldSystem .
+
+:ManipulationControlProgram a owl:Class ;
+    rdfs:label "ManipulationControlProgram"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :consumes ;
+            owl:someValuesFrom :Percept ],
+        [ a owl:Restriction ;
+            owl:onProperty :partOf ;
+            owl:someValuesFrom :ManipulationExecutive ],
+        [ a owl:Restriction ;
+            owl:onProperty :realizedAs ;
+            owl:someValuesFrom :RealizationForm ],
+        :dul_Description,
+        owl:Thing ;
+    owl:disjointWith :ManipulationExecutiveOperatingSystem .
+
+:ProblemDomain a owl:Class ;
+    rdfs:label "ProblemDomain"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :evidenceBaseFor ;
+            owl:someValuesFrom :CompetenceClaim ],
+        [ a owl:Restriction ;
+            owl:onClass :ManipulationProblemClass ;
+            owl:onProperty :generatedBy ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing ;
+    owl:disjointWith :ManipulationProblemClass .
+
+:SceneGraph a owl:Class ;
+    rdfs:label "SceneGraph"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :partitionedInto ;
+            owl:someValuesFrom :CouplingAlignedSubtree ],
+        [ a owl:Restriction ;
+            owl:hasValue true ;
+            owl:onProperty :isDataStructureRealization ],
+        [ a owl:Restriction ;
+            owl:onClass :RoleAssignmentLayer ;
+            owl:onProperty :hasRoleAssignmentLayer ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasRelationEdge ;
+            owl:someValuesFrom :RelationEdge ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasNode ;
+            owl:someValuesFrom :SceneNode ],
+        :dul_InformationObject,
+        owl:Thing ;
+    owl:disjointWith :BodyWorldSystem .
+
+:Sensor a owl:Class ;
+    rdfs:label "Sensor"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :partOf ;
+            owl:someValuesFrom :RobotBody ],
+        [ a owl:Restriction ;
+            owl:onProperty :mountedOn ;
+            owl:someValuesFrom :Link ],
+        :PhysicalEntity,
+        :dul_PhysicalObject,
+        owl:Thing ;
+    owl:disjointWith :Motor .
+
+:Signal a owl:Class ;
+    rdfs:label "Signal"^^xsd:string ;
+    rdfs:subClassOf :AbstractEntity,
+        :dul_InformationObject,
+        owl:Thing ;
+    owl:disjointWith :ManipulationEpisode .
+
+:WarrantedExecutiveCommitment a owl:Class ;
+    rdfs:label "WarrantedExecutiveCommitment"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:constrains a owl:ObjectProperty .
+
+:generates a owl:ObjectProperty .
+
+:isAbout a owl:ObjectProperty .
+
+:realizes a owl:ObjectProperty .
+
+:uses a owl:ObjectProperty .
+
+:Chronicle a owl:Class ;
+    rdfs:label "Chronicle"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue true ;
+            owl:onProperty :forwardBranching ],
+        [ a owl:Restriction ;
+            owl:hasValue true ;
+            owl:onProperty :maximal ],
+        [ a owl:Restriction ;
+            owl:onProperty :totallyOrders ;
+            owl:someValuesFrom :TimeInstant ],
+        :AbstractEntity,
+        :dul_Region,
+        owl:Thing ;
+    owl:disjointWith :EventType,
+        :FluentType,
+        :Occurrence,
+        :TimeInterval .
+
+:CompetenceClaim a owl:Class ;
+    rdfs:label "CompetenceClaim"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue true ;
+            owl:onProperty :isDispositional ],
+        [ a owl:Restriction ;
+            owl:onProperty :atDegree ;
+            owl:someValuesFrom :CompetenceDegree ],
+        [ a owl:Restriction ;
+            owl:hasValue false ;
+            owl:onProperty :licensedBySingleEpisode ],
+        [ a owl:Restriction ;
+            owl:onClass :ManipulationProblemClass ;
+            owl:onProperty :claimsOver ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:onProperty :heldBy ;
+            owl:someValuesFrom :RobotWorldManipulationSystem ],
+        :dul_Description,
+        owl:Thing ;
+    owl:disjointWith :VerdictComponent .
+
+:CouplingType a owl:Class ;
+    rdfs:label "CouplingType"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:FluentType a owl:Class ;
+    rdfs:label "FluentType"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue true ;
+            owl:onProperty :homogeneous ],
+        [ a owl:Restriction ;
+            owl:onProperty :holdsOver ;
+            owl:someValuesFrom :TimeInterval ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing ;
+    owl:disjointWith :Chronicle,
+        :EventType,
+        :Occurrence,
+        :TimeInterval .
+
+:ForceDynamicSchema a owl:Class ;
+    rdfs:label "ForceDynamicSchema"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :hasRoleSlot ;
+            owl:someValuesFrom :RoleSlot ],
+        [ a owl:Restriction ;
+            owl:hasValue true ;
+            owl:onProperty :isEventDescription ],
+        [ a owl:Restriction ;
+            owl:onProperty :definesConditionOn ;
+            owl:someValuesFrom :ForceDynamicEvent ],
+        [ a owl:Restriction ;
+            owl:onProperty :appliesTo ;
+            owl:someValuesFrom :ManipulationEpisode ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing ;
+    owl:disjointWith :ManipulationEpisode .
+
+:Goal a owl:Class ;
+    rdfs:label "Goal"^^xsd:string ;
+    rdfs:subClassOf :dul_Description,
+        owl:Thing .
+
+:Link a owl:Class ;
+    rdfs:label "Link"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :partOf ;
+            owl:someValuesFrom :RobotBody ],
+        [ a owl:Restriction ;
+            owl:onProperty :connectedBy ;
+            owl:someValuesFrom :Joint ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasPose ;
+            owl:someValuesFrom :SpatialPose ],
+        :PhysicalEntity,
+        :dul_PhysicalObject,
+        owl:Thing ;
+    owl:disjointWith :Joint .
+
+:Occurrence a owl:Class ;
+    rdfs:label "Occurrence"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :ofEventType ;
+            owl:someValuesFrom :EventType ],
+        [ a owl:Restriction ;
+            owl:onProperty :overInterval ;
+            owl:someValuesFrom :TimeInterval ],
+        :AbstractEntity,
+        :dul_Situation,
+        owl:Thing ;
+    owl:disjointWith :Chronicle,
+        :FluentType,
+        :TimeInterval .
+
+:RobotWorldManipulationSystem a owl:Class ;
+    rdfs:label "RobotWorldManipulationSystem"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue true ;
+            owl:onProperty :isClosedLoop ],
+        [ a owl:Restriction ;
+            owl:onProperty :assessedAgainst ;
+            owl:someValuesFrom :ManipulationProblemClass ],
+        [ a owl:Restriction ;
+            owl:hasValue false ;
+            owl:onProperty :problemIsProperPart ],
+        [ a owl:Restriction ;
+            owl:onClass :BodyWorldSystem ;
+            owl:onProperty :hasProperPart ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:onClass :ManipulationExecutive ;
+            owl:onProperty :hasProperPart ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        :dul_PhysicalObject,
+        owl:Thing ;
+    owl:disjointWith :ManipulationEpisode,
+        :ManipulationExecutive .
+
+:dul_Quality a owl:Class ;
+    rdfs:label "dul:Quality"^^xsd:string ;
+    rdfs:subClassOf owl:Thing .
+
+:Joint a owl:Class ;
+    rdfs:label "Joint"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onClass :JointType ;
+            owl:onProperty :hasJointType ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:onProperty :actuatedBy ;
+            owl:someValuesFrom :Motor ],
+        [ a owl:Restriction ;
+            owl:onClass :Link ;
+            owl:onProperty :connects ;
+            owl:qualifiedCardinality "2"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:onProperty :providesDOF ;
+            owl:someValuesFrom :DegreeOfFreedom ],
+        :PhysicalEntity,
+        :dul_PhysicalObject,
+        owl:Thing ;
+    owl:disjointWith :Link .
+
+:BodyWorldProcessMicrotheory a owl:Class ;
+    rdfs:label "BodyWorldProcessMicrotheory"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :meets ;
+            owl:someValuesFrom :OperationalizationCriterion ],
+        [ a owl:Restriction ;
+            owl:hasValue true ;
+            owl:onProperty :isScoped ],
+        [ a owl:Restriction ;
+            owl:onProperty :resourceFor ;
+            owl:someValuesFrom :ManipulationExecutive ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasScope ;
+            owl:someValuesFrom :ScopeCondition ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasTemplate ;
+            owl:someValuesFrom :MicrotheoryTemplate ],
+        [ a owl:Restriction ;
+            owl:onProperty :interpretsVia ;
+            owl:someValuesFrom :ProcessInterpretation ],
+        [ a owl:Restriction ;
+            owl:onProperty :formalizedBy ;
+            owl:someValuesFrom :ProbabilisticHybridProcessModel ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing ;
+    owl:disjointWith :BodyWorldSystem .
+
+:EvidenceBearingTrace a owl:Class ;
+    rdfs:label "EvidenceBearingTrace"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :relativeTo ;
+            owl:someValuesFrom :AssessmentRegime ],
+        [ a owl:Restriction ;
+            owl:hasValue false ;
+            owl:onProperty :isRawLog ],
+        [ a owl:Restriction ;
+            owl:onProperty :interprets ;
+            owl:someValuesFrom :Recording ],
+        [ a owl:Restriction ;
+            owl:hasValue true ;
+            owl:onProperty :isCriticRelative ],
+        :dul_InformationObject,
+        owl:Thing ;
+    owl:disjointWith :ManipulationEpisode,
+        :Recording .
+
+:ManipulationProblemClass a owl:Class ;
+    rdfs:label "ManipulationProblemClass"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:hasValue false ;
+            owl:onProperty :isRWMSComponent ],
+        [ a owl:Restriction ;
+            owl:onClass :MasteryCriterion ;
+            owl:onProperty :hasMasteryCriterion ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:onProperty :generates ;
+            owl:someValuesFrom :ProblemDomain ],
+        [ a owl:Restriction ;
+            owl:hasValue true ;
+            owl:onProperty :isGenerator ],
+        [ a owl:Restriction ;
+            owl:onClass :RWMSFamily ;
+            owl:onProperty :hasRWMSFamily ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:onClass :NuisanceModel ;
+            owl:onProperty :hasNuisanceModel ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasCriticSet ;
+            owl:someValuesFrom :Critic ],
+        [ a owl:Restriction ;
+            owl:onProperty :specifiedBy ;
+            owl:someValuesFrom :ProblemClassSpecificationTemplate ],
+        [ a owl:Restriction ;
+            owl:onClass :TaskScope ;
+            owl:onProperty :hasTaskScope ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing ;
+    owl:disjointWith :ProblemDomain .
+
+:TimeInterval a owl:Class ;
+    rdfs:label "TimeInterval"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :hasStart ;
+            owl:someValuesFrom :TimeInstant ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasEnd ;
+            owl:someValuesFrom :TimeInstant ],
+        :AbstractEntity,
+        :dul_Region,
+        owl:Thing ;
+    owl:disjointWith :Chronicle,
+        :EventType,
+        :FluentType,
+        :Occurrence .
+
+:hasProperPart a owl:ObjectProperty .
+
+:partOf a owl:ObjectProperty .
+
+:EventType a owl:Class ;
+    rdfs:label "EventType"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :occursOver ;
+            owl:someValuesFrom :TimeInterval ],
+        [ a owl:Restriction ;
+            owl:hasValue false ;
+            owl:onProperty :homogeneous ],
+        :AbstractEntity,
+        :dul_Description,
+        owl:Thing ;
+    owl:disjointWith :Chronicle,
+        :FluentType,
+        :TimeInterval .
+
+:RobotBody a owl:Class ;
+    rdfs:label "RobotBody"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :hasSensor ;
+            owl:someValuesFrom :Sensor ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasLink ;
+            owl:someValuesFrom :Link ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasEndEffector ;
+            owl:someValuesFrom :EndEffector ],
+        [ a owl:Restriction ;
+            owl:onProperty :generates ;
+            owl:someValuesFrom :BodyMotion ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasJoint ;
+            owl:someValuesFrom :Joint ],
+        :ArticulatedObject,
+        :PhysicalEntity,
+        owl:Thing ;
+    owl:disjointWith :ManipulationExecutive,
+        :WorldPhysicalEntity .
+
+:dul_Region a owl:Class ;
+    rdfs:label "dul:Region"^^xsd:string ;
+    rdfs:subClassOf :AbstractEntity,
+        owl:Thing .
+
+:ManipulationEpisode a owl:Class ;
+    rdfs:label "ManipulationEpisode"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onClass :CommitmentRecord ;
+            owl:onProperty :hasCommitmentRecord ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:onProperty :isRunOf ;
+            owl:someValuesFrom :RobotWorldManipulationSystem ],
+        [ a owl:Restriction ;
+            owl:onClass :ExecutiveEstimate ;
+            owl:onProperty :hasExecutiveEstimate ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasTrace ;
+            owl:someValuesFrom :EvidenceBearingTrace ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasLifecycleEvents ;
+            owl:someValuesFrom :LifecycleEvent ],
+        [ a owl:Restriction ;
+            owl:onClass :TaskRequest ;
+            owl:onProperty :hasRequest ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:hasValue true ;
+            owl:onProperty :isHierarchical ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasVerdictComponent ;
+            owl:someValuesFrom :VerdictComponent ],
+        [ a owl:Restriction ;
+            owl:onClass :BodyWorldTrajectory ;
+            owl:onProperty :hasPhysicalCore ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:maxQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+            owl:onClass :TaskEnvironmentEmbodimentClass ;
+            owl:onProperty :conformsToScope ],
+        [ a owl:Restriction ;
+            owl:onClass :Recording ;
+            owl:onProperty :hasRecording ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        [ a owl:Restriction ;
+            owl:hasValue true ;
+            owl:onProperty :isBounded ],
+        [ a owl:Restriction ;
+            owl:onClass :TerminalDisposition ;
+            owl:onProperty :hasTerminalDisposition ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ],
+        :AbstractEntity,
+        :dul_Situation,
+        owl:Thing ;
+    owl:disjointWith :ForceDynamicSchema,
+        :RobotWorldManipulationSystem .
+
+:dul_PhysicalObject a owl:Class ;
+    rdfs:label "dul:PhysicalObject"^^xsd:string ;
+    rdfs:subClassOf :PhysicalEntity,
+        owl:Thing .
+
+:PhysicalEntity a owl:Class ;
+    rdfs:subClassOf owl:Thing ;
+    owl:disjointWith :AbstractEntity .
+
+:ManipulationExecutive a owl:Class ;
+    rdfs:label "ManipulationExecutive"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :generates ;
+            owl:someValuesFrom :ActionToken ],
+        [ a owl:Restriction ;
+            owl:hasValue true ;
+            owl:onProperty :isAccountable ],
+        [ a owl:Restriction ;
+            owl:onProperty :discharges ;
+            owl:someValuesFrom :RepresentationalObligation ],
+        [ a owl:Restriction ;
+            owl:onProperty :controls ;
+            owl:someValuesFrom :BodyWorldSystem ],
+        :AbstractEntity,
+        :dul_Agent,
+        owl:Thing ;
+    owl:disjointWith :BodyWorldSystem,
+        :ProposalMechanism,
+        :Robot .
+
+:BodyWorldSystem a owl:Class ;
+    rdfs:label "BodyWorldSystem"^^xsd:string ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:onProperty :hasProperPart ;
+            owl:someValuesFrom :WorldPhysicalEntity ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasProperPart ;
+            owl:someValuesFrom :RobotBody ],
+        [ a owl:Restriction ;
+            owl:hasValue true ;
+            owl:onProperty :boundaryTaskRelative ],
+        [ a owl:Restriction ;
+            owl:onProperty :hasCoupling ;
+            owl:someValuesFrom :ForceInteraction ],
+        :PhysicalEntity,
+        :dul_PhysicalObject,
+        owl:Thing ;
+    owl:disjointWith :ManipulationEpisode,
+        :SceneGraph .
+
+:dul_InformationObject a owl:Class ;
+    rdfs:label "dul:InformationObject"^^xsd:string ;
+    rdfs:subClassOf :AbstractEntity,
+        owl:Thing .
+
+:dul_Description a owl:Class ;
+    rdfs:label "dul:Description"^^xsd:string ;
+    rdfs:subClassOf :AbstractEntity,
+        owl:Thing .
+
+:AbstractEntity a owl:Class ;
+    rdfs:subClassOf owl:Thing .
+

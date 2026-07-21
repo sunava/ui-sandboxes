@@ -1,0 +1,89 @@
+# Worked-example ABox — "Grasp the Egg to Lift It" (asymmetric force corridor)
+# Source: L0-raw-material/notes/2026-07-15-egg-lift-model.md
+# L1:     L1-okf-knowledge-base/bundle/concepts/worked-example-egg-lift.md
+#
+# The egg fragility schema F_slip < F_grasp < F_break, with a slip-and-regrasp
+# (restorable floor) and no repair for rupture (irreversible ceiling).
+# HermiT-checked by okf_abox.py (consistency + physical/abstract, world/belief,
+# fluent/event cuts). Illustrative fragment, not a closed world.
+
+classes:
+  Substance: null
+
+individuals:
+  # --- Physical ---
+  robot: [RobotBody]
+  gripper: [EndEffector]
+  egg: [PhysicalObject]
+  carton: [PhysicalObject]
+
+  # --- Abstract: the fragility schema and the problem ---
+  fds_egg: [ForceDynamicSchema]        # the two-sided force corridor
+  P_egg_lift: [ManipulationProblem]
+  ph_grasp: [Phase]
+  ph_lift: [Phase]
+  g_grasp: [MaintenanceGoal]           # F > F_slip: grasp_stable (restorable)
+  g_intact: [PreventionGoal]           # F < F_break: no shell_rupture (irreversible)
+  g_lifted: [AchievementGoal]          # egg clear of the carton
+
+  # --- Fluent types ---
+  grasp_stable: [FluentType]
+  egg_intact: [FluentType]
+  egg_clear: [FluentType]
+
+  # --- Event types ---
+  et_contact: [EventType]
+  et_ramp: [EventType]
+  et_slip: [EventType]                 # load drop (slip signature)
+  et_regrasp: [EventType]
+  et_shell_rupture: [EventType]        # forbidden (does NOT occur here)
+  et_lift: [EventType]
+
+  # --- Intervals ---
+  I_grasp: [TimeInterval]
+  I_slip: [TimeInterval]
+  I_regr: [TimeInterval]
+  I_lift: [TimeInterval]
+
+  # --- Episode E_egg_lift: a slip caught and regrasped, then a clean lift ---
+  E_egg_lift: [ManipulationEpisode]
+  o_contact: [WorldOccurrence]
+  o_ramp: [WorldOccurrence]
+  o_slip: [WorldOccurrence]
+  o_slip_B: [BeliefOccurrence]         # the ME registers the load drop
+  o_regrasp: [WorldOccurrence]
+  o_lift: [WorldOccurrence]
+
+relations:
+  - [robot, hasPart, gripper]
+  - [P_egg_lift, governedBy, fds_egg]
+  - [P_egg_lift, hasPhase, ph_grasp]
+  - [P_egg_lift, hasPhase, ph_lift]
+  - [P_egg_lift, hasGoal, g_grasp]
+  - [P_egg_lift, hasGoal, g_intact]
+  - [P_egg_lift, hasGoal, g_lifted]
+  - [g_grasp, goalFluent, grasp_stable]
+  - [g_lifted, goalFluent, egg_clear]
+  - [g_intact, forbidsEvent, et_shell_rupture]
+  # the episode: contact -> ramp -> slip -> regrasp -> lift, egg intact throughout
+  - [E_egg_lift, addresses, P_egg_lift]
+  - [E_egg_lift, hasOccurrence, o_contact]
+  - [E_egg_lift, hasOccurrence, o_ramp]
+  - [E_egg_lift, hasOccurrence, o_slip]
+  - [E_egg_lift, hasOccurrence, o_regrasp]
+  - [E_egg_lift, hasOccurrence, o_lift]
+  - [E_egg_lift, hasBeliefOccurrence, o_slip_B]
+  - [o_contact, ofEventType, et_contact]
+  - [o_ramp, ofEventType, et_ramp]
+  - [o_slip, ofEventType, et_slip]
+  - [o_regrasp, ofEventType, et_regrasp]
+  - [o_lift, ofEventType, et_lift]
+  - [o_slip, overInterval, I_slip]
+  - [o_regrasp, overInterval, I_regr]
+  - [o_lift, overInterval, I_lift]
+  - [grasp_stable, holdsOver, I_grasp]   # holds before slip; lapses over I_slip; re-holds after regrasp
+  - [egg_intact, holdsOver, I_lift]      # intact throughout (rupture never occurs)
+  - [o_slip, renders, o_slip_B]
+  - [I_grasp, before, I_slip]
+  - [I_slip, meets, I_regr]
+  - [I_regr, meets, I_lift]

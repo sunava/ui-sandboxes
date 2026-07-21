@@ -1,0 +1,104 @@
+# Worked-example ABox — "Pour the Pancake Mix into the Pan" (open-surface spread)
+# Source: L0-raw-material/notes/2026-07-15-pour-pancake-pan-model.md
+# L1:     L1-okf-knowledge-base/bundle/concepts/worked-example-pour-pancake-pan.md
+#
+# The pour onto an open surface: batter spreads to a radius rather than filling
+# to a level, so the stop criterion is coverage/area and the off-rim escape is
+# irreversible. HermiT-checked by okf_abox.py (consistency + the cuts). An
+# illustrative fragment, not a closed world.
+
+classes:
+  Substance: null
+
+individuals:
+  # --- Physical ---
+  robot: [RobotBody]
+  jug: [PhysicalObject]
+  pan: [PhysicalObject]              # an OPEN surface, not a container
+  batter: [Substance]
+
+  # --- Abstract: problem and goals ---
+  P_pour_pan: [ManipulationProblem]
+  ph_flow: [Phase]
+  g_coverage: [AchievementGoal]      # puddle radius reaches a*
+  g_nooverrun: [PreventionGoal]      # no substance_escape (radius reaches R_pan: off the rim)
+  g_centered: [MaintenanceGoal]      # pour point over the pan centre
+
+  # --- Deepening: the spreading microtheory (open-surface-spreading-dl.md) ---
+  spread_mt: [OpenSurfaceSpreading]  # the batter's spread as a body-world process
+  a_now: [SpreadRadius]              # the puddle radius a(t)
+  a_target: [SpreadRadius]           # the coverage target a*
+  h_film: [FilmThickness]            # h(a): thins as radius grows, arrests at h_eq
+  arrest_yield: [YieldEquilibriumArrest]  # rho*g*h falls below tau_y at h_eq
+  arrest_thermal: [ThermalSetArrest]      # cooking gels the batter, fixing the shape
+
+  # --- Fluent types ---
+  radius_ge_target: [FluentType]     # a(t) >= a*
+  radius_at_rim: [FluentType]        # a(t) >= R_pan  (the escape trigger)
+  centered: [FluentType]
+
+  # --- Event types ---
+  et_tip: [EventType]
+  et_flow: [EventType]
+  et_spread: [EventType]             # the puddle spreads (a(t)=sqrt(rho t/(pi h)))
+  et_stop_flow: [EventType]
+  et_substance_escape: [EventType]   # batter runs off the rim (irreversible)
+
+  # --- Intervals ---
+  I_tip: [TimeInterval]
+  I_flow: [TimeInterval]
+  I_stop: [TimeInterval]
+
+  # --- Episode E_pan_ok: stop when radius reaches a*, within the rim ---
+  E_pan_ok: [ManipulationEpisode]
+  ok_tip: [WorldOccurrence]
+  ok_flow: [WorldOccurrence]
+  ok_spread: [WorldOccurrence]
+  ok_stop: [WorldOccurrence]
+
+  # --- Episode E_pan_over: poured too long — batter runs off the rim ---
+  E_pan_over: [ManipulationEpisode]
+  ov_flow: [WorldOccurrence]
+  ov_spread: [WorldOccurrence]
+  ov_escape: [WorldOccurrence]
+
+relations:
+  - [robot, hasPart, jug]
+  - [P_pour_pan, hasPhase, ph_flow]
+  - [P_pour_pan, hasGoal, g_coverage]
+  - [P_pour_pan, hasGoal, g_nooverrun]
+  - [P_pour_pan, hasGoal, g_centered]
+  - [g_coverage, goalFluent, radius_ge_target]
+  - [g_centered, goalFluent, centered]
+  - [g_nooverrun, forbidsEvent, et_substance_escape]
+  # the spreading microtheory: radius grows, film thins, arrests at h_eq or setting
+  - [spread_mt, onFlatObject, pan]
+  - [spread_mt, hasSpreadRadius, a_now]
+  - [spread_mt, hasFilmThickness, h_film]
+  - [spread_mt, hasCoverageTarget, a_target]
+  - [spread_mt, arrestedByEvent, arrest_yield]
+  - [spread_mt, arrestedByEvent, arrest_thermal]
+  - [h_film, thinsAsRadiusGrows, true]
+  # good pour: tip -> flow -> spread -> stop at a*, within rim
+  - [E_pan_ok, addresses, P_pour_pan]
+  - [E_pan_ok, hasOccurrence, ok_tip]
+  - [E_pan_ok, hasOccurrence, ok_flow]
+  - [E_pan_ok, hasOccurrence, ok_spread]
+  - [E_pan_ok, hasOccurrence, ok_stop]
+  - [ok_tip, ofEventType, et_tip]
+  - [ok_flow, ofEventType, et_flow]
+  - [ok_spread, ofEventType, et_spread]
+  - [ok_stop, ofEventType, et_stop_flow]
+  - [ok_flow, overInterval, I_flow]
+  - [centered, holdsOver, I_flow]
+  - [radius_ge_target, holdsOver, I_stop]
+  - [I_tip, meets, I_flow]
+  - [I_flow, meets, I_stop]
+  # off-rim overrun (irreversible)
+  - [E_pan_over, addresses, P_pour_pan]
+  - [E_pan_over, hasOccurrence, ov_flow]
+  - [E_pan_over, hasOccurrence, ov_spread]
+  - [E_pan_over, hasOccurrence, ov_escape]
+  - [ov_flow, ofEventType, et_flow]
+  - [ov_spread, ofEventType, et_spread]
+  - [ov_escape, ofEventType, et_substance_escape]

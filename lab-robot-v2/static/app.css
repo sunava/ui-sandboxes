@@ -124,6 +124,22 @@ body{
 .workflow-head small{font-size:11px;color:var(--faint)}
 .workflow-head em{font-style:normal;color:var(--action);font-size:11px;font-weight:600}
 .workflow-strip{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px}
+
+/* vial position panel (sliders + numbers, synced with dragging the vial) */
+.vial-ctl{display:flex;align-items:center;gap:14px;margin-top:10px;flex-wrap:wrap}
+.vc-title{font-size:11px;font-weight:600;color:var(--warn);white-space:nowrap}
+.vc-axis{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--muted);font-weight:600}
+.vc-axis input[type=range]{width:130px;accent-color:var(--warn);cursor:pointer}
+.vc-axis input[type=number]{
+  width:62px;background:var(--bg2);color:var(--ink);border:1px solid var(--line2);
+  border-radius:var(--radius);padding:3px 6px;font-family:var(--mono);font-size:11.5px;
+}
+.vc-axis input[type=number]:focus{outline:none;border-color:var(--warn)}
+.vc-reset{
+  background:none;border:1px solid var(--line2);color:var(--muted);border-radius:var(--radius);
+  padding:3px 10px;font-size:11px;font-weight:600;cursor:pointer;
+}
+.vc-reset:hover{color:var(--ink);border-color:var(--warn)}
 .wstep{
   flex:0 0 auto;display:flex;align-items:center;gap:8px;cursor:pointer;
   padding:8px 12px;border-radius:4px;border:1px solid var(--line2);

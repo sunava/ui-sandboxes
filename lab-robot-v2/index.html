@@ -47,13 +47,29 @@
       </div>
 
       <div id="step-caption" class="step-caption hidden"></div>
-      <div class="stage-hint">drag orbit · scroll zoom · right-drag pan</div>
+      <div class="stage-hint">drag orbit · scroll zoom · right-drag pan · drag the yellow vial to move it</div>
     </div>
 
     <div class="workflow">
       <div class="workflow-head">
-        <span>Robot motion · <em>recorded pycram + giskardpy trajectory</em></span>
+        <span>Robot motion · <em>recorded pycram + giskardpy trajectory — drag the TSB vial, the pickup adapts</em></span>
         <button id="play-btn" class="play-btn cram" title="Play the recorded pycram + giskardpy motion trajectory">▶ Play robot motion</button>
+      </div>
+      <div class="vial-ctl" id="vial-ctl" style="display:none">
+        <span class="vc-title">Vial pickup position</span>
+        <label class="vc-axis">X
+          <input type="range" id="vial-x">
+          <input type="number" id="vial-x-num" step="0.01"> m
+        </label>
+        <label class="vc-axis">Y
+          <input type="range" id="vial-y">
+          <input type="number" id="vial-y-num" step="0.01"> m
+        </label>
+        <label class="vc-axis">Z
+          <input type="range" id="vial-z">
+          <input type="number" id="vial-z-num" step="0.01"> m
+        </label>
+        <button id="vial-reset" class="vc-reset" title="Back to the recorded pickup spot">reset</button>
       </div>
     </div>
   </section>

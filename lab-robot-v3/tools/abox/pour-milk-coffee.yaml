@@ -1,0 +1,86 @@
+# Worked-example ABox — "Pour the Milk into the Coffee" (ratio target)
+# Source: L0-raw-material/notes/2026-07-15-pour-milk-coffee-model.md
+# L1:     L1-okf-knowledge-base/bundle/concepts/worked-example-pour-milk-coffee.md
+#
+# The miscible baseline in the pouring family: the continuous-flow pour of
+# pour-example.yaml with (a) coffee already present in the receiver and (b) a
+# ratio achievement goal. HermiT-checked by okf_abox.py for consistency and the
+# physical/abstract, world/belief, and fluent/event cuts. An illustrative
+# fragment, not a closed world.
+
+classes:
+  Substance: null            # a poured/received substance component
+
+individuals:
+  # --- Physical ---
+  robot: [RobotBody]
+  carton: [PhysicalObject]           # source
+  mug: [PhysicalObject]              # receiver, already holding coffee
+  milk: [Substance]
+  coffee: [Substance]                # present in the mug at t_start
+
+  # --- Abstract: problem and goals ---
+  P_pour_mc: [ManipulationProblem]
+  ph_flow: [Phase]
+  g_ratio: [AchievementGoal]         # milk:coffee reaches r*
+  g_nospill: [PreventionGoal]        # no substance_escape (level > CAP)
+  g_aligned: [MaintenanceGoal]       # spout over the mug
+
+  # --- Fluent types ---
+  ratio_reached: [FluentType]        # milk/(milk+coffee) >= r*
+  aligned: [FluentType]
+  over_capacity: [FluentType]        # level > CAP  (headroom is CAP - coffee)
+
+  # --- Event types ---
+  et_tip: [EventType]
+  et_flow: [EventType]
+  et_stop_flow: [EventType]
+  et_substance_escape: [EventType]
+
+  # --- Intervals ---
+  I_tip: [TimeInterval]
+  I_flow: [TimeInterval]
+  I_stop: [TimeInterval]
+
+  # --- Episode E_mc_ok: stop within the (coffee-tightened) window ---
+  E_mc_ok: [ManipulationEpisode]
+  ok_tip: [WorldOccurrence]
+  ok_flow: [WorldOccurrence]
+  ok_stop: [WorldOccurrence]
+
+  # --- Episode E_mc_over: stop too late — mug overflows on top of the coffee ---
+  E_mc_over: [ManipulationEpisode]
+  ov_flow: [WorldOccurrence]
+  ov_escape: [WorldOccurrence]
+  ov_stop: [WorldOccurrence]
+
+relations:
+  - [robot, hasPart, carton]
+  - [P_pour_mc, hasPhase, ph_flow]
+  - [P_pour_mc, hasGoal, g_ratio]
+  - [P_pour_mc, hasGoal, g_nospill]
+  - [P_pour_mc, hasGoal, g_aligned]
+  - [g_ratio, goalFluent, ratio_reached]
+  - [g_aligned, goalFluent, aligned]
+  - [g_nospill, forbidsEvent, et_substance_escape]
+  # clean pour: tip -> flow -> stop, ratio reached, no escape
+  - [E_mc_ok, addresses, P_pour_mc]
+  - [E_mc_ok, hasOccurrence, ok_tip]
+  - [E_mc_ok, hasOccurrence, ok_flow]
+  - [E_mc_ok, hasOccurrence, ok_stop]
+  - [ok_tip, ofEventType, et_tip]
+  - [ok_flow, ofEventType, et_flow]
+  - [ok_stop, ofEventType, et_stop_flow]
+  - [ok_flow, overInterval, I_flow]
+  - [aligned, holdsOver, I_flow]
+  - [ratio_reached, holdsOver, I_stop]
+  - [I_tip, meets, I_flow]
+  - [I_flow, meets, I_stop]
+  # overflow: coffee-occupied headroom exceeded
+  - [E_mc_over, addresses, P_pour_mc]
+  - [E_mc_over, hasOccurrence, ov_flow]
+  - [E_mc_over, hasOccurrence, ov_escape]
+  - [E_mc_over, hasOccurrence, ov_stop]
+  - [ov_flow, ofEventType, et_flow]
+  - [ov_escape, ofEventType, et_substance_escape]
+  - [ov_stop, ofEventType, et_stop_flow]

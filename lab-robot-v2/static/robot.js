@@ -104,6 +104,67 @@
   const DEMO_ARM_MOTION = true;
   let traj = null, trajPlaying = false, playhead = 0, gripperLinkObj = null;
 
+  // ---- draggable pickup object: the user can move the vial on the bench; at
+  // play start the recorded grasp is retargeted to its new spot via IK ---------
+  const LEFT_ARM = [
+    'left_shoulder_pan_joint', 'left_shoulder_lift_joint', 'left_elbow_joint',
+    'left_wrist_1_joint', 'left_wrist_2_joint', 'left_wrist_3_joint',
+  ];
+  const DRAG_BOUNDS = { minX: 0.60, maxX: 1.00, minY: -0.40, maxY: 0.60,   // bench area (map frame)
+                        minZ: 0.95, maxZ: 1.50 };  // grasp height (vial centre; 0.95 = standing on the bench)
+  let dragId = null;            // which prop is draggable (the trajectory's held object)
+  let dragging = false;
+  let jointOffsets = null;      // joint -> radians delta, blended into the pickup
+  let gripCap = 0.25;           // max left-gripper closing (rad) — set from the grasp frame
+
+  // both bench objects spawn ON the bench (the recording has them floating at
+  // the heights the original plan reached for); the retarget solves take the
+  // motion to them. Values are map-frame z of the object group's centre.
+  const SPAWN_Z = { media_tsb: 0.95, sterility_canister: 0.96 };
+
+  // pour-and-place: extra IK offset sets active during the place segment.
+  // pourOffsets holds the vial above the canister for the pour, placeOffsets
+  // stands it down onto the bench at the recorded release spot.
+  let placeOffsets = null, pourOffsets = null;
+  let pourAtFrame = 0, pourPhase = 0, pourDone = false;
+  let pourTilt = 0;             // signed tilt for this playback (sign picked geometrically)
+  const POUR_TILT = 1.9;        // wrist-roll tilt magnitude (rad), past horizontal so it pours
+  const POUR_SECONDS = 1.8;     // how long the full tilt is held over the opening
+  const POUR_CLEAR = 0.06;      // vial mouth this far above the canister opening
+
+  // roll the gripper 180° for the grasp so its bulky side faces up. −π (not +π)
+  // keeps wrist_3 inside its ±2π limit (the recorded grasp value is ~4.19 rad).
+  // Applied in the gripper's local frame from approach until after release, so
+  // the held vial's path through space is exactly the recorded one.
+  const FLIP_JOINT = 'left_wrist_3_joint';
+  const GRIP_FLIP = -Math.PI;
+
+  // vial position API for the UI panel (sliders/number inputs in the workflow bar)
+  const vialReadyCbs = [], vialMovedCbs = [];
+  function getVialPos() {
+    const p = dragId && props[dragId];
+    return p ? { x: p.group.position.x, y: p.group.position.y, z: p.group.position.z } : null;
+  }
+  function setVialPos(x, y, z) {
+    const p = dragId && props[dragId];
+    if (!p) return null;
+    if (trajPlaying) return getVialPos();     // the running pickup is already planned
+    p.group.position.x = Math.min(DRAG_BOUNDS.maxX, Math.max(DRAG_BOUNDS.minX, x));
+    p.group.position.y = Math.min(DRAG_BOUNDS.maxY, Math.max(DRAG_BOUNDS.minY, y));
+    if (z !== undefined)
+      p.group.position.z = Math.min(DRAG_BOUNDS.maxZ, Math.max(DRAG_BOUNDS.minZ, z));
+    keepOut(p);
+    p.homePos.copy(p.group.position);
+    needsRender = true;
+    return getVialPos();
+  }
+  function resetVial() {
+    const meta = traj && dragId && traj.objects && traj.objects[dragId];
+    if (!meta) return null;
+    const z = SPAWN_Z[dragId] !== undefined ? SPAWN_Z[dragId] : meta.pos[2];
+    return setVialPos(meta.pos[0], meta.pos[1], z);
+  }
+
   // ---- grasp follow: while the recorded plan holds an object, the object rides
   // the gripper with the exact relative pose it had at the grasp instant -------
   const _v = new THREE.Vector3(), _q = new THREE.Quaternion(), _q2 = new THREE.Quaternion(), _rq = new THREE.Quaternion(), _off = new THREE.Vector3();
@@ -153,7 +214,7 @@
     // upgrade every mesh to a PBR material so the environment map gives it
     // realistic metal/plastic reflections
     robot.traverse(function (c) {
-      if (!c.isMesh) return;
+      if (!c.isMesh || c.userData.pickProxy) return;
       c.castShadow = true;
       c.receiveShadow = true;
       const wasArray = Array.isArray(c.material);
@@ -208,7 +269,22 @@
         if (!d) return;
         traj = d;
         gripperLinkObj = (robot.links && robot.links[d.gripperLink]) || null;
+        dragId = d.heldObject || null;
+        // the recorded plan keeps commanding the gripper closed past contact
+        // (0.79 rad ≈ fully shut) while it holds the vial, which visually clips
+        // the fingers through it. Cap the closing at the value of the grasp
+        // instant — the moment the plan considered the fingers in contact.
+        const gAtt = d.frames && d.frames[d.attachFrame];
+        gripCap = gAtt ? Math.abs(gAtt['left_robotiq_85_left_knuckle_joint'] || 0) || 0.25 : 0.25;
         if (d.objects) buildProps(d.objects);
+        for (const sid in SPAWN_Z) {
+          const sp = props[sid];
+          if (sp) { sp.group.position.z = SPAWN_Z[sid]; sp.homePos.copy(sp.group.position); }
+        }
+        if (dragId && props[dragId]) {
+          addPickProxy(props[dragId]);
+          vialReadyCbs.forEach(function (cb) { cb(); });
+        }
         needsRender = true;
       })
       .catch(function () {});
@@ -234,9 +310,12 @@
 
   function playTrajectory() {
     if (!traj || !robot) return false;
+    if (dragging) endDrag();
     trajPlaying = true; heldNow = false;
+    pourPhase = 0; pourDone = false;
     playhead = playStartFrame(); playEnd = traj.frames.length - 1;
     resetProps();
+    computeRetarget();
     return true;
   }
   function stopTrajectory() { trajPlaying = false; heldNow = false; }
@@ -265,11 +344,42 @@
     robot.getWorldQuaternion(_rq).invert();
     p.group.quaternion.copy(_rq).multiply(_q2);
   }
-  function stepTrajectory() {
+  // set all joints for playhead position f: recorded frames + blended retarget
+  // offsets + the gripper flip. Used by playback and by the collision sweep.
+  function applyFrame(f) {
     const F = traj.frames;
-    const i0 = Math.floor(playhead), i1 = Math.min(i0 + 1, F.length - 1), a = playhead - i0;
+    const i0 = Math.floor(f), i1 = Math.min(i0 + 1, F.length - 1), a = f - i0;
     const f0 = F[i0], f1 = F[i1];
-    for (const k in f0) { const j = robot.joints[k]; if (j) j.setJointValue(f0[k] + (f1[k] - f0[k]) * a); }
+    const w = jointOffsets ? retargetWeight(f) : 0;
+    const wp = pourOffsets ? pourWeight(f) : 0;
+    const wl = placeOffsets ? placeWeight(f) : 0;
+    const wf = flipWeight(f);
+    for (const k in f0) {
+      const j = robot.joints[k]; if (!j) continue;
+      let v = f0[k] + (f1[k] - f0[k]) * a;
+      if (w && jointOffsets[k] !== undefined) v += jointOffsets[k] * w;
+      if (wp && pourOffsets[k] !== undefined) v += pourOffsets[k] * wp;
+      if (wl && placeOffsets[k] !== undefined) v += placeOffsets[k] * wl;
+      // the tilt rides the pour weight: the vial rotates up while it glides to
+      // the canister (bottom swinging away from it) and rights itself on the
+      // way to the landing spot — no upright dip into the canister
+      if (k === FLIP_JOINT) { if (wf) v += GRIP_FLIP * wf; if (wp) v += pourTilt * wp; }
+      if (k.indexOf('left_robotiq') === 0)                // fingers stop at the vial, not through it
+        v = Math.max(-gripCap, Math.min(gripCap, v));
+      j.setJointValue(v);
+    }
+  }
+
+  function stepTrajectory() {
+    // the pour hold: freeze the playhead while the vial is fully tipped over
+    // the canister opening (the tilt itself rides the pour weight in/out)
+    const pouring = pourOffsets && !pourDone && heldNow && playhead >= pourAtFrame;
+    if (pouring) {
+      pourPhase += 1 / (60 * POUR_SECONDS);
+      if (pourPhase >= 1) pourDone = true;
+    }
+    applyFrame(playhead);
+    const i0 = Math.floor(playhead);
 
     const obj = traj.heldObject;
     if (obj && i0 >= traj.attachFrame && i0 < traj.detachFrame) {
@@ -279,9 +389,401 @@
       heldNow = false;
     }
 
-    playhead += (traj.fps / 60) * 1.8;            // ~1.8× real-time (tick ≈ 60 fps)
+    if (!pouring)
+      playhead += (traj.fps / 60) * 1.8;          // ~1.8× real-time (tick ≈ 60 fps)
     if (playhead >= playEnd) { trajPlaying = false; heldNow = false; stepStartCb('__done__'); }
   }
+
+  // ------------------------------------------------ pickup retargeting (IK) ----
+  // The trajectory is a fixed recording, so when the vial is dragged somewhere
+  // else the recorded grasp would miss it. At play start we solve IK once for
+  // the left arm at the grasp instant, shifted by the vial's displacement, and
+  // blend the resulting joint deltas in over the reach (0 → 1 at the grasp) and
+  // back out over the lift-carry (1 → 0 by the start of the place segment) —
+  // so the pour/place still happens exactly on the recorded path.
+  function smoothstep(t) { t = Math.min(1, Math.max(0, t)); return t * t * (3 - 2 * t); }
+
+  function retargetWeight(f) {
+    const pick = segByStep('pickup'), place = segByStep('place');
+    const a = pick ? pick.start : 0;
+    const b = traj.attachFrame;
+    const c = place ? place.start : traj.detachFrame;
+    if (f <= a || f >= c) return 0;
+    if (f < b) return smoothstep((f - a) / (b - a));
+    return 1 - smoothstep((f - b) / (c - b));
+  }
+
+  // the gripper flip ramps in over the reach, then HOLDS through carry, pour and
+  // place (unlike the position retarget): a local-frame roll kept constant while
+  // the object is attached cancels out of the object's world path — rolling back
+  // mid-carry would spin the vial. It unwinds only after the release.
+  function flipWeight(f) {
+    if (!GRIP_FLIP) return 0;
+    const pick = segByStep('pickup');
+    const a = pick ? pick.start : 0;
+    const b = traj.attachFrame, d = traj.detachFrame;
+    const end = traj.frames.length - 1;
+    if (f <= a || f >= end) return 0;
+    if (f < b) return smoothstep((f - a) / (b - a));
+    if (f < d) return 1;
+    return 1 - smoothstep((f - d) / (end - d));
+  }
+
+  // pour offsets: carry the vial to above the canister (ramp in over the early
+  // place segment), hold for the pour, then hand over to the landing offsets
+  function pourWeight(f) {
+    const place = segByStep('place'); if (!place) return 0;
+    const a = place.start, d = traj.detachFrame, fe = d - 8;
+    if (f <= a || f >= fe) return 0;
+    const b = a + 0.3 * (d - a);
+    if (f < b) return smoothstep((f - a) / (b - a));
+    if (f <= pourAtFrame) return 1;
+    return 1 - smoothstep((f - pourAtFrame) / (fe - pourAtFrame));
+  }
+  // landing offsets: cross-fade in from the pour spot, hold through the release,
+  // unwind while the (empty) hand retreats
+  function placeWeight(f) {
+    const place = segByStep('place'); if (!place) return 0;
+    const d = traj.detachFrame, fe = d - 8, end = traj.frames.length - 1;
+    const a = pourOffsets ? pourAtFrame : place.start;
+    if (f <= a) return 0;
+    if (f < fe) return smoothstep((f - a) / (fe - a));
+    if (f < d) return 1;
+    return 1 - smoothstep((f - d) / (end - d));
+  }
+
+  // ---- table collision guard --------------------------------------------------
+  // Points along the arm that must stay above the bench top, each with an
+  // approximate body radius. Endpoints suffice for the straight tube segments.
+  const TABLE_TOP = 0.88;        // bench surface, map frame (== world y here)
+  const CLEAR_MARGIN = 0.012;
+  const CLEAR_JOINTS = [
+    ['left_elbow_joint', 0.06], ['left_wrist_1_joint', 0.05],
+    ['left_wrist_2_joint', 0.05], ['left_wrist_3_joint', 0.05],
+  ];
+  const CLEAR_LINKS = [
+    ['left_robotiq_85_base_link', 0.055],
+    ['left_robotiq_85_left_finger_tip_link', 0.015],
+    ['left_robotiq_85_right_finger_tip_link', 0.015],
+  ];
+  // worst signed clearance of the monitored points at the CURRENT joint state
+  function tableClearance() {
+    let worst = Infinity;
+    CLEAR_JOINTS.forEach(function (c) {
+      const o = robot.joints[c[0]];
+      if (o) { o.getWorldPosition(_v); worst = Math.min(worst, _v.y - c[1] - TABLE_TOP); }
+    });
+    CLEAR_LINKS.forEach(function (c) {
+      const o = robot.links && robot.links[c[0]];
+      if (o) { o.getWorldPosition(_v); worst = Math.min(worst, _v.y - c[1] - TABLE_TOP); }
+    });
+    return worst;
+  }
+  // deepest violation (m) over the whole retargeted stretch of the playback,
+  // with the candidate jointOffsets applied. 0 → everything clears the bench.
+  function sweepViolation() {
+    const pick = segByStep('pickup');
+    const a = pick ? pick.start : 0;
+    let worst = Infinity;
+    for (let f = a; f <= traj.frames.length - 1; f += 8) {
+      applyFrame(f);
+      robot.updateMatrixWorld(true);
+      worst = Math.min(worst, tableClearance());
+    }
+    return Math.max(0, CLEAR_MARGIN - worst);
+  }
+
+  function setFrameJoints(fr) {
+    for (const k in fr) { const j = robot.joints[k]; if (j) j.setJointValue(fr[k]); }
+  }
+  function offsetsFrom(sol, fr) {
+    const o = {};
+    LEFT_ARM.forEach(function (n) { o[n] = sol[n] - (fr[n] || 0); });
+    return o;
+  }
+
+  // Solve the retarget offsets for this playback: grasp the vial wherever it
+  // stands, pour above the canister, stand the vial down on the bench. All
+  // three targets share the recorded gripper orientation; a common grasp lift
+  // (regrasp higher up the vial) is raised until the whole blended motion
+  // clears the bench top.
+  function computeRetarget() {
+    jointOffsets = pourOffsets = placeOffsets = null;
+    const id = traj && traj.heldObject, p = id && props[id];
+    const meta = id && traj.objects && traj.objects[id];
+    if (!p || !meta || !gripperLinkObj) return;
+
+    const place = segByStep('place');
+    pourAtFrame = place ? Math.round(place.start + 0.45 * (traj.detachFrame - place.start)) : traj.detachFrame;
+    const canister = place && place.place && props[place.place];
+
+    const saved = {};
+    for (const n in robot.joints) saved[n] = robot.joints[n].angle || 0;
+
+    // recorded gripper poses at the grasp and at the release instant
+    const gA = traj.frames[traj.attachFrame] || {};
+    setFrameJoints(gA); robot.updateMatrixWorld(true);
+    const attPos = gripperLinkObj.getWorldPosition(new THREE.Vector3());
+    const attQ = gripperLinkObj.getWorldQuaternion(new THREE.Quaternion());
+    const gD = traj.frames[traj.detachFrame] || {};
+    setFrameJoints(gD); robot.updateMatrixWorld(true);
+    const detPos = gripperLinkObj.getWorldPosition(new THREE.Vector3());
+    const detQ = gripperLinkObj.getWorldQuaternion(new THREE.Quaternion());
+
+    // world-frame displacement of the vial from its recorded spot
+    robot.getWorldQuaternion(_rq);
+    const deltaW = new THREE.Vector3(
+      p.group.position.x - meta.pos[0], p.group.position.y - meta.pos[1], p.group.position.z - meta.pos[2]
+    ).applyQuaternion(_rq);
+    const vialW = p.group.getWorldPosition(new THREE.Vector3());
+    const canW = canister ? canister.group.getWorldPosition(new THREE.Vector3()) : null;
+    const landY = TABLE_TOP + (p.h || 0.14) / 2 + 0.004;  // vial standing on the bench
+
+    const MAX_LIFT = Math.min(0.09, (p.h || 0.14) * 0.55 + 0.02);
+    let lift = 0;
+    for (let attempt = 0; attempt < 5; attempt++) {
+      // 1) grasp at the vial (skip if it stands exactly on the recorded spot)
+      const graspTarget = attPos.clone().add(deltaW).addScaledVector(UP, lift);
+      jointOffsets = null;
+      if (deltaW.length() > 0.004 || lift > 0) {
+        setFrameJoints(gA);
+        const s = solveArmIK(graspTarget, attQ.clone());
+        if (!s) break;                                    // unreachable → play as recorded
+        jointOffsets = offsetsFrom(s, gA);
+      }
+      // where the vial sits relative to the gripper once grasped
+      const relW = vialW.clone().sub(graspTarget);
+
+      // 2) pour spot: the vial's MOUTH, at full tilt, sits just above the
+      // canister opening. The vial pivots about the wrist roll axis (the line
+      // through the grasp point), so mouth-at-tilt = pivot + R·(mouth − pivot).
+      pourOffsets = null;
+      if (canW && POUR_TILT) {
+        setFrameJoints(gD); robot.updateMatrixWorld(true);
+        const j3 = robot.joints[FLIP_JOINT];
+        const axisW = j3.axis.clone().applyQuaternion(j3.getWorldQuaternion(new THREE.Quaternion()));
+        // tilt sign: the bottom must swing back toward the release side, so the
+        // body never sweeps across the canister while turning
+        const sideDir = detPos.clone().add(relW).sub(canW); sideDir.y = 0; sideDir.normalize();
+        const bottomAt = function (sgn) { return new THREE.Vector3(0, -1, 0).applyAxisAngle(axisW, sgn * POUR_TILT); };
+        pourTilt = bottomAt(1).dot(sideDir) >= bottomAt(-1).dot(sideDir) ? POUR_TILT : -POUR_TILT;
+
+        const canTopY = canW.y + (canister.h || 0.11) / 2 + 0.05;   // above the ports too
+        const mouthTarget = canW.clone().setY(canTopY + POUR_CLEAR);
+        // mouth relative to the pivot (grasp height on the vial): h/2 + relW.y
+        const mouthArm = new THREE.Vector3(0, (p.h || 0.14) / 2 + relW.y, 0).applyAxisAngle(axisW, pourTilt);
+        const gt = mouthTarget.sub(mouthArm).sub(new THREE.Vector3(relW.x, 0, relW.z));
+        const s2 = solveArmIK(gt, detQ.clone());
+        if (s2) pourOffsets = offsetsFrom(s2, gD);
+      }
+      // 3) landing: recorded release spot, but the vial standing on the bench
+      const gt2 = detPos.clone().setY(landY - relW.y);
+      setFrameJoints(gD);
+      const s3 = solveArmIK(gt2, detQ.clone());
+      placeOffsets = s3 ? offsetsFrom(s3, gD) : null;
+
+      const viol = sweepViolation();
+      if (!viol || lift >= MAX_LIFT) break;               // clean (or as high as a grasp can go)
+      lift = Math.min(MAX_LIFT, lift + viol + 0.01);
+    }
+    for (const n in saved) { const j = robot.joints[n]; if (j) j.setJointValue(saved[n]); }
+  }
+  const UP = new THREE.Vector3(0, 1, 0);                  // world up
+
+  // damped-least-squares IK over the 6 left-arm joints: move the gripper base
+  // link to the target pose (position + orientation). Operates on the live
+  // joints; the caller saves/restores the joint state around it.
+  function solveArmIK(targetPos, targetQuat) {
+    const joints = LEFT_ARM.map(function (n) { return robot.joints[n]; });
+    if (!gripperLinkObj || joints.some(function (j) { return !j; })) return null;
+    const pe = new THREE.Vector3(), qe = new THREE.Quaternion(), qerr = new THREE.Quaternion();
+    const jp = new THREE.Vector3(), jq = new THREE.Quaternion(), ax = new THREE.Vector3(), arm = new THREE.Vector3();
+    const LAMBDA2 = 0.0025, STEP = 0.2;
+    let perr = Infinity;
+    for (let iter = 0; iter < 80; iter++) {
+      robot.updateMatrixWorld(true);
+      gripperLinkObj.getWorldPosition(pe);
+      gripperLinkObj.getWorldQuaternion(qe);
+      qerr.copy(qe).invert().premultiply(targetQuat);     // rotation still needed
+      if (qerr.w < 0) { qerr.x = -qerr.x; qerr.y = -qerr.y; qerr.z = -qerr.z; qerr.w = -qerr.w; }
+      const ang = 2 * Math.acos(Math.min(1, qerr.w));
+      const s = Math.sqrt(Math.max(0, 1 - qerr.w * qerr.w));
+      const k = s > 1e-6 ? ang / s : 2;
+      const e = [targetPos.x - pe.x, targetPos.y - pe.y, targetPos.z - pe.z, qerr.x * k, qerr.y * k, qerr.z * k];
+      perr = Math.hypot(e[0], e[1], e[2]);
+      if (perr < 0.002 && ang < 0.01) break;
+      // geometric Jacobian, one column per joint: [axis × (pe − pj); axis]
+      const J = joints.map(function (j) {
+        j.getWorldPosition(jp);
+        j.getWorldQuaternion(jq);
+        ax.copy(j.axis).applyQuaternion(jq);
+        arm.copy(pe).sub(jp);
+        const lin = new THREE.Vector3().crossVectors(ax, arm);
+        return [lin.x, lin.y, lin.z, ax.x, ax.y, ax.z];
+      });
+      // dq = Jᵀ (J Jᵀ + λ²I)⁻¹ e
+      const A = [];
+      for (let r = 0; r < 6; r++) {
+        A[r] = [];
+        for (let c = 0; c < 6; c++) {
+          let v = 0;
+          for (let i = 0; i < 6; i++) v += J[i][r] * J[i][c];
+          A[r][c] = v + (r === c ? LAMBDA2 : 0);
+        }
+      }
+      const y = solve6(A, e);
+      if (!y) return null;
+      for (let c = 0; c < 6; c++) {
+        let dq = 0;
+        for (let r = 0; r < 6; r++) dq += J[c][r] * y[r];
+        dq = Math.max(-STEP, Math.min(STEP, dq));
+        joints[c].setJointValue((joints[c].angle || 0) + dq);
+      }
+    }
+    if (perr > 0.05) return null;                         // did not get close enough
+    const out = {};
+    LEFT_ARM.forEach(function (n) { out[n] = robot.joints[n].angle || 0; });
+    return out;
+  }
+
+  // 6×6 linear solve, Gaussian elimination with partial pivoting
+  function solve6(A, b) {
+    const n = 6, M = A.map(function (row, i) { return row.concat([b[i]]); });
+    for (let c = 0; c < n; c++) {
+      let p = c;
+      for (let r = c + 1; r < n; r++) if (Math.abs(M[r][c]) > Math.abs(M[p][c])) p = r;
+      if (Math.abs(M[p][c]) < 1e-12) return null;
+      const t = M[p]; M[p] = M[c]; M[c] = t;
+      for (let r = c + 1; r < n; r++) {
+        const f = M[r][c] / M[c][c];
+        for (let k = c; k <= n; k++) M[r][k] -= f * M[c][k];
+      }
+    }
+    const x = new Array(n);
+    for (let r = n - 1; r >= 0; r--) {
+      let v = M[r][n];
+      for (let c = r + 1; c < n; c++) v -= M[r][c] * x[c];
+      x[r] = v / M[r][r];
+    }
+    return x;
+  }
+
+  // -------------------------------------------------- drag the vial around ----
+  // Left-drag the vial to move it anywhere on the bench (within DRAG_BOUNDS);
+  // the next play picks it up from there. Orbit controls pause while dragging.
+  // Motion is mapped from screen deltas via the camera basis instead of a
+  // ray/bench-plane intersection: the default camera sits almost level with the
+  // bench, where a horizontal plane is hit at grazing angles (or not at all for
+  // screen-down drags), which made pulling the vial forward impossible.
+  const dragRay = new THREE.Raycaster(), dragNdc = new THREE.Vector2();
+  const dragStartNdc = new THREE.Vector2(), dragStartWorld = new THREE.Vector3();
+  const camRight = new THREE.Vector3(), camFwd = new THREE.Vector3(), camUp = new THREE.Vector3();
+
+  function pointerNdc(e) {
+    const r = renderer.domElement.getBoundingClientRect();
+    dragNdc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+  }
+  function pickDraggable(e) {
+    if (!dragId || !props[dragId]) return null;
+    pointerNdc(e);
+    dragRay.setFromCamera(dragNdc, camera);
+    const meshes = [];
+    props[dragId].group.traverse(function (c) { if (c.isMesh) meshes.push(c); });
+    return dragRay.intersectObjects(meshes, false).length ? props[dragId] : null;
+  }
+  // invisible, slightly fatter cylinder so the thin vial is easy to grab
+  function addPickProxy(p) {
+    const r = Math.max(0.05, (p.h || 0.1) * 0.5);
+    const m = new THREE.Mesh(
+      new THREE.CylinderGeometry(r, r, (p.h || 0.1) * 1.6, 12),
+      new THREE.MeshBasicMaterial({ visible: false })
+    );
+    m.userData.pickProxy = true;
+    p.group.add(m);
+  }
+
+  renderer.domElement.addEventListener('pointerdown', function (e) {
+    if (trajPlaying || e.button !== 0) return;
+    const p = pickDraggable(e);
+    if (!p) return;
+    dragging = true;
+    controls.enabled = false;
+    renderer.domElement.setPointerCapture(e.pointerId);
+    renderer.domElement.style.cursor = 'grabbing';
+    dragStartNdc.copy(dragNdc);                           // pointerNdc ran in pickDraggable
+    p.group.getWorldPosition(dragStartWorld);
+    p.glowTarget = 1;
+    if (p.label) p.label.visible = true;
+    needsRender = true;
+    e.preventDefault();
+  });
+  renderer.domElement.addEventListener('pointermove', function (e) {
+    if (!dragging) {
+      if (!trajPlaying && e.buttons === 0)
+        renderer.domElement.style.cursor = pickDraggable(e) ? 'grab' : '';
+      return;
+    }
+    pointerNdc(e);
+    // world metres per NDC unit at the vial's distance from the (static) camera
+    const dist = camera.position.distanceTo(dragStartWorld);
+    const halfH = Math.tan((camera.fov * Math.PI) / 360) * dist;
+    const halfW = halfH * camera.aspect;
+    // horizontal camera basis: screen-x → right, screen-y → away from camera.
+    // The away axis is foreshortened by the view pitch; compensate, but clamp
+    // the gain so a near-level camera stays controllable.
+    camera.getWorldDirection(camFwd);
+    const pitch = Math.max(0.3, Math.abs(camFwd.y));
+    camRight.set(1, 0, 0).applyQuaternion(camera.quaternion);
+    camRight.y = 0; camRight.normalize();
+    // blend the horizontal parts of the view and up vectors: they point the same
+    // way (away from the camera) and never vanish together, at any pitch
+    camUp.set(0, 1, 0).applyQuaternion(camera.quaternion);
+    camFwd.y = 0; camUp.y = 0;
+    camFwd.add(camUp).normalize();
+    _v.copy(dragStartWorld)
+      .addScaledVector(camRight, (dragNdc.x - dragStartNdc.x) * halfW)
+      .addScaledVector(camFwd, (dragNdc.y - dragStartNdc.y) * (halfH / pitch));
+    const p = props[dragId];
+    robot.worldToLocal(_v);                               // map frame (z-up), height stays
+    p.group.position.x = Math.min(DRAG_BOUNDS.maxX, Math.max(DRAG_BOUNDS.minX, _v.x));
+    p.group.position.y = Math.min(DRAG_BOUNDS.maxY, Math.max(DRAG_BOUNDS.minY, _v.y));
+    keepOut(p);
+    p.homePos.copy(p.group.position);                     // survives resetProps()
+    vialMovedCbs.forEach(function (cb) { cb(getVialPos()); });
+    needsRender = true;
+  });
+  // don't let the vial be dropped inside another bench object — push it to the
+  // rim of a small keep-out circle around each one instead
+  function keepOut(p) {
+    const MIN_D = 0.10;
+    for (const id in props) {
+      if (id === dragId) continue;
+      const o = props[id].group.position;
+      const dx = p.group.position.x - o.x, dy = p.group.position.y - o.y;
+      const d = Math.hypot(dx, dy);
+      if (d >= MIN_D) continue;
+      if (d > 1e-6) {
+        p.group.position.x = o.x + (dx / d) * MIN_D;
+        p.group.position.y = o.y + (dy / d) * MIN_D;
+      } else {
+        p.group.position.y = o.y + MIN_D;
+      }
+    }
+  }
+  function endDrag() {
+    if (!dragging) return;
+    dragging = false;
+    controls.enabled = true;
+    renderer.domElement.style.cursor = '';
+    const p = props[dragId];
+    if (p) {
+      p.glowTarget = 0;
+      if (p.label) p.label.visible = false;
+    }
+    needsRender = true;
+  }
+  renderer.domElement.addEventListener('pointerup', endDrag);
+  renderer.domElement.addEventListener('pointercancel', endDrag);
 
   // --------------------------------------------------------- bench objects ----
   // Which bench objects to actually place. Kept minimal for now — expand this
@@ -647,6 +1149,12 @@
     setAutoRotate: setAutoRotate,
     setFloorVisible: setFloorVisible,
     hasTrajectory: function () { return DEMO_ARM_MOTION && !!traj; },
+    onVialReady: function (cb) { if (dragId && props[dragId]) cb(); else vialReadyCbs.push(cb); },
+    onVialMoved: function (cb) { vialMovedCbs.push(cb); },
+    getVialPos: getVialPos,
+    setVialPos: setVialPos,
+    resetVial: resetVial,
+    getVialBounds: function () { return Object.assign({}, DRAG_BOUNDS); },
     hasSegment: function (step) { return !!segByStep(step); },
     playTrajectory: playTrajectory,
     stopTrajectory: stopTrajectory,

@@ -498,6 +498,49 @@
     if (window.RobotView && RobotView.onReady) RobotView.onReady(labelPlay);
   }
 
+  // ---- vial position panel: sliders/numbers synced with dragging in 3D ------
+  (function () {
+    const ctl = document.getElementById('vial-ctl');
+    if (!ctl || !window.RobotView || !RobotView.onVialReady) return;
+    const sx = document.getElementById('vial-x'), nx = document.getElementById('vial-x-num');
+    const sy = document.getElementById('vial-y'), ny = document.getElementById('vial-y-num');
+    const sz = document.getElementById('vial-z'), nz = document.getElementById('vial-z-num');
+    const reset = document.getElementById('vial-reset');
+
+    function sync(pos) {
+      if (!pos) return;
+      sx.value = nx.value = pos.x.toFixed(2);
+      sy.value = ny.value = pos.y.toFixed(2);
+      sz.value = nz.value = pos.z.toFixed(2);
+    }
+    function apply() {
+      const x = parseFloat(nx.value !== '' ? nx.value : sx.value);
+      const y = parseFloat(ny.value !== '' ? ny.value : sy.value);
+      const z = parseFloat(nz.value !== '' ? nz.value : sz.value);
+      if (isFinite(x) && isFinite(y) && isFinite(z)) sync(RobotView.setVialPos(x, y, z));
+      else sync(RobotView.getVialPos());
+    }
+
+    RobotView.onVialReady(function () {
+      const b = RobotView.getVialBounds();
+      [sx, nx].forEach(function (i) { i.min = b.minX; i.max = b.maxX; i.step = 0.01; });
+      [sy, ny].forEach(function (i) { i.min = b.minY; i.max = b.maxY; i.step = 0.01; });
+      [sz, nz].forEach(function (i) { i.min = b.minZ; i.max = b.maxZ; i.step = 0.01; });
+      sync(RobotView.getVialPos());
+      ctl.style.display = '';
+    });
+    RobotView.onVialMoved(sync);
+
+    [sx, sy, sz].forEach(function (s, i) {
+      s.addEventListener('input', function () {
+        [nx, ny, nz][i].value = s.value;
+        apply();
+      });
+    });
+    [nx, ny, nz].forEach(function (n) { n.addEventListener('change', apply); });
+    reset.addEventListener('click', function () { sync(RobotView.resetVial()); });
+  })();
+
   // ---- view toggle 3D / photo ----------------------------------------------
   function showView(v) {
     const is3d = v === '3d';
