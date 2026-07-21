@@ -1,3 +1,47 @@
+# lab-robot-v3 — The Lab Robot (Tracy) · EQL edition
+
+Third iteration: exact copy of `../lab-robot-v2` (interactive pick-pour-place
+demo) with the reasoning panel switched from in-browser Prolog to **EQL**,
+krrood's Entity Query Language from the CRAM architecture
+(`~/cognitive_robot_abstract_machine/krrood`).
+
+## EQL instead of Prolog
+
+The right-hand panel now queries the **recorded demo episode itself** — bench
+objects, robot parts, action episodes (park / pickup / place), per-joint motion
+statistics — modelled as Python dataclasses in `eql_kb.py` and queried with EQL:
+
+    an(entity(obj).where(obj.kind == 'bottle'))
+    set_of(ep.name, ep.duration_s)
+    set_of(j.name, j.range_rad).ordered_by(j.range_rad, descending=True).limit(5)
+
+Ready-made variables: `obj` (bench objects), `ep` (episodes), `arm`, `j`
+(joint motion), `rob`, `pkg` (CRAM packages), `cls` (CRAM Python classes).
+Queries run server-side: `POST /api/eql`; the entity graph comes from
+`GET /api/kb`.
+
+## The whole CRAM architecture is in the KB
+
+`eql_kb.py` AST-scans `~/cognitive_robot_abstract_machine` (no imports, cached
+in `.eql_arch_cache.json`): every package and every Python class (name, module,
+base classes, method count, first docstring line) plus cross-package import
+dependencies. Delete the cache file to force a rescan after the repo changes.
+
+    an(entity(cls).where(cls.name.endswith('Designator')))
+    set_of(cls.package, c := count(cls)).grouped_by(cls.package).ordered_by(c, descending=True)
+    an(entity(cls).where(in_('Symbol', cls.bases)))
+
+## Running
+
+    ~/.virtualenvs/cram-env/bin/python server.py     # EQL needs krrood (cram-env)
+    python3 server.py                                # auto re-execs into cram-env
+
+Then open http://localhost:8711 (or pass a port).
+
+---
+
+Below: the original v2 notes (robot viewer, trajectory, retargeting — all still apply).
+
 # lab-robot-v2 — The Lab Robot (Tracy), rebuilt properly
 
 Second iteration of the AICOR showcase UI. Scope: **only the first lab**

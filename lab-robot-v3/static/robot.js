@@ -703,7 +703,9 @@
   }
 
   renderer.domElement.addEventListener('pointerdown', function (e) {
-    if (trajPlaying || e.button !== 0) return;
+    if (e.button !== 0) return;
+    clickX = e.clientX; clickY = e.clientY; clickArmed = true;   // for click-to-inspect
+    if (trajPlaying) return;
     const p = pickDraggable(e);
     if (!p) return;
     dragging = true;
@@ -782,8 +784,52 @@
     }
     needsRender = true;
   }
-  renderer.domElement.addEventListener('pointerup', endDrag);
-  renderer.domElement.addEventListener('pointercancel', endDrag);
+  renderer.domElement.addEventListener('pointerup', function (e) {
+    endDrag();
+    // ---- click-to-inspect: a press that barely moved is a click, not an orbit
+    // drag — resolve what was hit and report the matching KB entity id
+    if (!clickArmed) return;
+    clickArmed = false;
+    if (Math.hypot(e.clientX - clickX, e.clientY - clickY) > 5) return;
+    const id = pickEntity(e);
+    if (id && partClickCb) { partClickCb(id); highlight(true); needsRender = true; }
+  });
+  renderer.domElement.addEventListener('pointercancel', function () { clickArmed = false; endDrag(); });
+
+  // ---- click-to-inspect helpers ----------------------------------------------
+  let partClickCb = null;
+  let clickX = 0, clickY = 0, clickArmed = false;
+
+  // nearest hit under the pointer → KB entity id: a bench object (its group
+  // carries userData.propId) or a robot part, classified by its URDF link name
+  function pickEntity(e) {
+    if (!robot) return null;
+    pointerNdc(e);
+    dragRay.setFromCamera(dragNdc, camera);
+    const hits = dragRay.intersectObject(robot, true);
+    for (let i = 0; i < hits.length; i++) {
+      if (hits[i].object.isSprite) continue;              // object labels
+      const id = classifyHit(hits[i].object);
+      if (id) return id;
+    }
+    return null;
+  }
+  function classifyHit(obj) {
+    let o = obj;
+    while (o && o !== scene) {
+      if (o.userData && o.userData.propId) return o.userData.propId;
+      if (o.isURDFLink && o.name) {
+        const n = o.name;
+        if (n.indexOf('left_robotiq') === 0) return 'left_gripper';
+        if (n.indexOf('right_robotiq') === 0) return 'right_gripper';
+        if (n.indexOf('left_') === 0) return 'left_arm';
+        if (n.indexOf('right_') === 0) return 'right_arm';
+        return 'tracy';                                   // table, camera pole, base…
+      }
+      o = o.parent;
+    }
+    return null;
+  }
 
   // --------------------------------------------------------- bench objects ----
   // Which bench objects to actually place. Kept minimal for now — expand this
@@ -807,6 +853,7 @@
 
     function register(id, group, mats, h, pos, label) {
       group.rotation.x = Math.PI / 2;          // stand up along map z
+      group.userData.propId = id;              // click-to-inspect resolves meshes to this
       group.position.set(pos[0], pos[1], pos[2]);
       robot.add(group);
       props[id] = { group: group, mats: mats, glow: 0, glowTarget: 0, h: h || 0, homeQuat: group.quaternion.clone() };
@@ -1149,6 +1196,7 @@
     setAutoRotate: setAutoRotate,
     setFloorVisible: setFloorVisible,
     hasTrajectory: function () { return DEMO_ARM_MOTION && !!traj; },
+    onPartClick: function (cb) { partClickCb = cb; },
     onVialReady: function (cb) { if (dragId && props[dragId]) cb(); else vialReadyCbs.push(cb); },
     onVialMoved: function (cb) { vialMovedCbs.push(cb); },
     getVialPos: getVialPos,

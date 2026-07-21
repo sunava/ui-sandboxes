@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>AICOR · The Lab Robot (Tracy)</title>
+<title>AICOR · The Lab Robot (Tracy) · EQL</title>
 <link rel="stylesheet" href="static/app.css" />
 </head>
 <body>
@@ -12,7 +12,7 @@
     <div class="logo">◧◧</div>
     <div class="brand-text">
       <h1>AICOR System · The Lab Robot</h1>
-      <p>Tracy — reasoning over the real AICOR&nbsp;L2 knowledge base</p>
+      <p>Tracy — EQL entity queries over the recorded demo episode</p>
     </div>
   </div>
   <div class="topbar-actions">
@@ -52,7 +52,7 @@
 
     <div class="workflow">
       <div class="workflow-head">
-        <span>Robot motion · <em>recorded pycram + giskardpy trajectory — drag the TSB vial, the pickup adapts</em></span>
+        <span>Move the yellow vial, then press play — the pickup adapts</span>
         <button id="play-btn" class="play-btn cram" title="Play the recorded pycram + giskardpy motion trajectory">▶ Play robot motion</button>
       </div>
       <div class="vial-ctl" id="vial-ctl" style="display:none">
@@ -77,33 +77,31 @@
   <!-- ========================= RIGHT : KNOWLEDGE ========================= -->
   <section class="panel panel-right">
     <div class="panel-head">
-      <h2>AICOR&nbsp;L2 ontology &amp; reasoning</h2>
-      <span id="kb-status" class="kb-status">loading ontology…</span>
+      <h2>EQL · entity query language</h2>
+      <span id="kb-status" class="kb-status">loading knowledge base…</span>
     </div>
 
     <div class="query-box">
       <div class="query-row">
-        <input id="query-input" type="text" spellcheck="false"
-               placeholder="Ask the ontology:  superclasses('AchievementGoal', L)." />
+        <textarea id="query-input" rows="2" spellcheck="false"
+               placeholder="an(entity(obj).where(obj.kind == 'bottle'))   —  vars: obj, ep, arm, j, rob"></textarea>
         <button id="query-run">Run</button>
       </div>
       <div id="presets" class="presets"><!-- filled by JS --></div>
     </div>
 
     <div id="answer" class="answer">
-      <div class="answer-empty">Loading the real AICOR&nbsp;L2 knowledge base…</div>
+      <div class="answer-empty">Loading the episode knowledge base…</div>
     </div>
 
     <div class="graph-wrap">
       <div id="graph"></div>
-      <div class="legend" id="legend"></div>
-      <div id="graph-modes" class="graph-modes">
-        <div class="gm-title">Edges</div>
-        <label class="gm-row"><input type="checkbox" id="mode-isa" checked disabled><i class="gm-edge" style="--ec:#39d5c8"></i><span>is-a <small>(hierarchy)</small></span></label>
-        <label class="gm-row"><input type="checkbox" id="mode-rel"><i class="gm-edge" style="--ec:#b98cff"></i><span>Relationships <small>(object properties)</small></span></label>
-        <label class="gm-row"><input type="checkbox" id="mode-restr"><i class="gm-edge dashed" style="--ec:#ffb648"></i><span>Restrictions <small>(cardinality)</small></span></label>
-        <label class="gm-row"><input type="checkbox" id="mode-disj"><i class="gm-edge dashed" style="--ec:#ff6b8b"></i><span>Disjointness <small>(incompatible)</small></span></label>
+      <div id="graph-nav" class="graph-nav" style="display:none">
+        <button id="gnav-home" title="back to the overview">⌂</button>
+        <button id="gnav-up" title="one level up">↑ back</button>
+        <span id="gnav-path"></span>
       </div>
+      <div class="legend" id="legend"></div>
     </div>
   </section>
 </main>
@@ -117,10 +115,7 @@
 <script src="vendor/OrbitControls.js"></script>
 <script src="vendor/URDFLoader.js"></script>
 <script src="vendor/vis-network.min.js"></script>
-<script src="vendor/tau-prolog.js"></script>
-<script src="vendor/tau-lists.js"></script>
 <!-- app -->
-<script src="static/kb.js"></script>
 <script src="static/robot.js"></script>
 <script src="static/graph.js"></script>
 <script src="static/main.js"></script>

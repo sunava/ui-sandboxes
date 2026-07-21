@@ -14,7 +14,8 @@
   const GROUP_STYLE = {
     // ---- TBox ----
     root:    { color: '#e8eefb', ring: '#ffffff', size: 24, label: 'Root concept' },
-    klass:   { color: '#5b8cff', ring: '#a9c2ff', size: 15, label: 'Class' },
+    klass:   { color: '#5b8cff', ring: '#a9c2ff', size: 15, label: 'Subpackage' },
+    pyclass: { color: '#ffb648', ring: '#ffd89a', size: 13, label: 'Python class' },
     upper:   { color: '#8c9bbd', ring: '#c3ccdf', size: 14, label: 'Upper ontology (DUL)' },
     // ---- ABox individuals, bucketed by their asserted type ----
     robot:   { color: '#ff7a9c', ring: '#ffb3c6', size: 20, label: 'Robot / body' },
@@ -36,6 +37,7 @@
 
   let network = null, nodes = null, edges = null, allNodeIds = [];
   let selectCb = function () {};
+  let dblCb = function () {};
   let freezeTimer = null;   // re-freeze physics a moment after a node drag ends
 
   function build(data) {
@@ -47,25 +49,21 @@
     const rawEdges = data.edges.filter(function (e) {
       const k = e.from + '>' + e.to + '>' + (e.label || ''); if (seen[k]) return false; seen[k] = 1; return true;
     });
-    // beyond this many edges, drop text labels — rendering hundreds of edge
-    // labels on every pan/zoom is a big cost and they're unreadable when dense.
-    const showLabels = rawEdges.length <= LABEL_LIMIT;
+    // plain lines: no edge labels, no arrowheads — the relation name only shows
+    // as a hover tooltip, and in the answer panel when a node is clicked
     const visEdges = rawEdges.map(function (e) {
       const s = EDGE_STYLE[e.kind] || EDGE_STYLE.default;
-      const lbl = showLabels && e.label ? e.label : undefined;
       return {
         from: e.from, to: e.to,
-        label: lbl,
+        title: e.label || undefined,
         color: { color: s.c, opacity: s.o }, width: s.w, dashes: s.d || false,
-        arrows: s.noArrow ? { to: { enabled: false } } : undefined,
-        font: lbl ? { color: '#93a4c4', size: 10, strokeWidth: 3, strokeColor: '#0b1220', align: 'middle' } : undefined,
       };
     });
 
     nodes = new vis.DataSet(visNodes);
     edges = new vis.DataSet(visEdges);
     allNodeIds = visNodes.map(function (n) { return n.id; });
-    const bigGraph = visNodes.length > 90;
+    const bigGraph = visNodes.length > 170;
 
     const groups = {};
     Object.keys(GROUP_STYLE).forEach(function (g) {
@@ -82,7 +80,7 @@
       groups: groups,
       nodes: { scaling: { min: 12, max: 30 } },
       // straight edges render far cheaper than smooth curves at hundreds of edges
-      edges: { smooth: false, arrows: { to: { enabled: true, scaleFactor: 0.4 } } },
+      edges: { smooth: false, arrows: { to: { enabled: false } } },
       physics: {
         // fewer settle iterations; physics is switched OFF once stable (below)
         stabilization: { iterations: bigGraph ? 120 : 200, updateInterval: 25 },
@@ -95,8 +93,12 @@
 
     // freeze the simulation once it has settled — this is the key win: without it
     // vis keeps simulating forever, so every hover/redraw stays laggy.
+    // Then fit the whole (now expanded) layout into the viewport: the initial
+    // zoom is from before the physics spread the nodes out, so without this
+    // the outer nodes end up outside the visible area.
     network.once('stabilizationIterationsDone', function () {
       network.setOptions({ physics: false });
+      network.fit({ animation: { duration: 500, easingFunction: 'easeInOutQuad' } });
     });
 
     // …but re-animate while a node is being dragged, so neighbours spring along
@@ -116,17 +118,34 @@
     network.on('click', function (params) {
       if (params.nodes.length) selectCb(params.nodes[0]);
     });
+    // double-click: on a node → drill into it; on empty space → fit the view
+    network.on('doubleClick', function (params) {
+      if (params.nodes.length) dblCb(params.nodes[0]);
+      else if (!params.edges.length)
+        network.fit({ animation: { duration: 400, easingFunction: 'easeInOutQuad' } });
+    });
 
     buildLegend(data);
   }
 
-  const LABEL_LIMIT = 130;
-
   function buildLegend(data) {
     legendEl.innerHTML = '';
+    // a view can override the legend labels (e.g. the URDF tree relabels the
+    // reused group colours as left arm / right arm / gripper / camera / base)
+    if (data.legend) {
+      data.legend.forEach(function (row) {
+        const st = GROUP_STYLE[row.group];
+        if (!st) return;
+        const d = document.createElement('div');
+        d.className = 'li';
+        d.innerHTML = '<span class="dot" style="background:' + st.color + '"></span>' + row.label;
+        legendEl.appendChild(d);
+      });
+      return;
+    }
     const present = {};
     data.nodes.forEach(function (n) { present[n.group] = 1; });
-    ['root', 'klass', 'upper', 'robot', 'object', 'event', 'goal', 'concept', 'ind']
+    ['root', 'klass', 'pyclass', 'upper', 'robot', 'object', 'event', 'goal', 'concept', 'ind']
       .filter(function (g) { return present[g]; })
       .forEach(function (g) {
         const st = GROUP_STYLE[g];
@@ -177,5 +196,6 @@
     focus: focus,
     resize: resize,
     onSelect: function (cb) { selectCb = cb; },
+    onDoubleSelect: function (cb) { dblCb = cb; },
   };
 })();
