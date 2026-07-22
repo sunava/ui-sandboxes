@@ -84,7 +84,7 @@
     <div class="query-box">
       <div class="query-row">
         <textarea id="query-input" rows="2" spellcheck="false"
-               placeholder="an(Robot)   ·   the(BenchObject)(kind='bottle')   ·   classes: Robot, Arm, BenchObject, ActionEpisode, Package, PythonClass …">
+               placeholder="an(entity(obj).where(obj.kind == 'bottle'))   —  vars: obj, ep, arm, j, rob"></textarea>
         <button id="query-run">Run</button>
       </div>
       <div id="presets" class="presets"><!-- filled by JS --></div>

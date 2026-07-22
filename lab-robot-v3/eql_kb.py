@@ -3,9 +3,7 @@
 EQL is krrood's pythonic relational query language (part of the CRAM
 architecture, ~/cognitive_robot_abstract_machine/krrood). This module models
 the recorded pycram/giskardpy episode — bench objects, robot parts, action
-episodes, per-joint motion — plus the whole CRAM architecture, as dataclasses
-that inherit from krrood's `Symbol` (so instances auto-register in the global
-SymbolGraph and queries name the class directly). It exposes:
+episodes, per-joint motion — as plain dataclasses and exposes:
 
     fresh_namespace()  -> dict for evaluating one EQL query (fresh variables)
     run_query(code)    -> execute an EQL query string, return JSON-able result
@@ -20,13 +18,6 @@ import math
 import os
 from dataclasses import dataclass, fields, is_dataclass
 from typing import Optional
-
-# Every entity the query interface exposes inherits from Symbol, so each
-# instance auto-registers in krrood's global SymbolGraph the moment it is
-# constructed. That is what lets queries name the class directly —
-# `an(Robot)`, `the(BenchObject)(kind='bottle')`, `variable(PythonClass)` —
-# with no per-type domain and no throwaway variable names.
-from krrood.entity_query_language.factories import Symbol
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 DEMO_JSON = os.path.join(ROOT, "static", "tracy_demo.json")
@@ -70,14 +61,14 @@ class Position:
 
 
 @dataclass(unsafe_hash=True)
-class Gripper(Symbol):
+class Gripper:
     name: str
     side: str
     opening_m: float = 0.085          # Robotiq 2F-85
 
 
 @dataclass(unsafe_hash=True)
-class Arm(Symbol):
+class Arm:
     name: str
     side: str
     robot: str
@@ -85,13 +76,13 @@ class Arm(Symbol):
 
 
 @dataclass(unsafe_hash=True)
-class Robot(Symbol):
+class Robot:
     name: str
     arm_count: int
 
 
 @dataclass(unsafe_hash=True)
-class BenchObject(Symbol):
+class BenchObject:
     name: str
     kind: str
     label: str
@@ -100,7 +91,7 @@ class BenchObject(Symbol):
 
 
 @dataclass(unsafe_hash=True)
-class ActionEpisode(Symbol):
+class ActionEpisode:
     name: str
     index: int
     start_frame: int
@@ -112,7 +103,7 @@ class ActionEpisode(Symbol):
 
 
 @dataclass(unsafe_hash=True)
-class JointMotion(Symbol):
+class JointMotion:
     name: str
     arm_side: str                     # 'left' | 'right'
     min_rad: float
@@ -122,7 +113,7 @@ class JointMotion(Symbol):
 
 # ---- the CRAM architecture itself, scanned from ~/cognitive_robot_abstract_machine
 @dataclass(unsafe_hash=True)
-class Package(Symbol):
+class Package:
     name: str
     description: str
     module_count: int
@@ -130,7 +121,7 @@ class Package(Symbol):
 
 
 @dataclass(unsafe_hash=True)
-class SubPackage(Symbol):
+class SubPackage:
     name: str                         # qualified, e.g. 'coraplex.plans'
     package: str
     module_count: int
@@ -138,7 +129,7 @@ class SubPackage(Symbol):
 
 
 @dataclass(unsafe_hash=True)
-class PythonClass(Symbol):
+class PythonClass:
     name: str
     package: str
     subpackage: str                   # 'coraplex.plans' (== package for top-level modules)
@@ -371,19 +362,25 @@ _FACTORY_NAMES = [
 
 def fresh_namespace():
     from krrood.entity_query_language import factories as F
-    get_kb()   # ensure every entity is constructed and registered in the SymbolGraph
+    kb = get_kb()
     ns = {n: getattr(F, n) for n in _FACTORY_NAMES if hasattr(F, n)}
-    # Only the classes are exposed — no throwaway `obj` / `ep` variables. Because
-    # every class is a Symbol, its instances live in the global SymbolGraph, so a
-    # query names the class directly:
-    #   an(Robot)                              — all robots
-    #   the(BenchObject)(kind='bottle')        — structural match by field
-    #   variable(PythonClass)                  — a symbolic var (no domain needed)
     ns.update(
-        Symbol=Symbol, Position=Position, Gripper=Gripper, Arm=Arm, Robot=Robot,
+        Position=Position, Gripper=Gripper, Arm=Arm, Robot=Robot,
         BenchObject=BenchObject, ActionEpisode=ActionEpisode, JointMotion=JointMotion,
         Package=Package, SubPackage=SubPackage, PythonClass=PythonClass,
+        objects=kb.objects, episodes=kb.episodes, arms=kb.arms,
+        grippers=kb.grippers, joints=kb.joints, robots=[kb.robot],
+        packages=kb.packages, subpackages=kb.subpackages, classes=kb.classes,
     )
+    # ready-made query variables so one-liners stay short
+    ns["obj"] = F.variable(BenchObject, domain=kb.objects)
+    ns["ep"] = F.variable(ActionEpisode, domain=kb.episodes)
+    ns["arm"] = F.variable(Arm, domain=kb.arms)
+    ns["j"] = F.variable(JointMotion, domain=kb.joints)
+    ns["rob"] = F.variable(Robot, domain=[kb.robot])
+    ns["pkg"] = F.variable(Package, domain=kb.packages)
+    ns["sub"] = F.variable(SubPackage, domain=kb.subpackages)
+    ns["cls"] = F.variable(PythonClass, domain=kb.classes)
     return ns
 
 
@@ -454,7 +451,7 @@ def _entity_row(item, highlight):
         highlight.append(item.package)
     row = {"__entity__": name or repr(item), "__type__": type(item).__name__}
     for f in fields(item):
-        if f.name != "name" and not f.name.startswith("_"):   # skip Symbol internals
+        if f.name != "name":
             row[f.name] = _jsonable(getattr(item, f.name))
     return row
 
@@ -739,34 +736,34 @@ def _class_view(kb, cls):
 
 
 PRESETS = [
-    # --- the scene: name the class directly, no throwaway variables ---
+    # --- the scene: which robot, how many arms, which objects ---
     {"text": "which robot is this?",
-     "code": "an(Robot)"},
+     "code": "the(entity(rob))"},
     {"text": "how many arms does it have?",
-     "code": "set_of(count(variable(Arm)))"},
-    {"text": "the yellow vial",
-     "code": "the(BenchObject)(kind='bottle')"},
-    {"text": "which objects are on the bench?",
-     "code": "an(BenchObject)"},
+     "code": "the(rob.arm_count)"},
     {"text": "each arm and its gripper",
-     "code": "set_of((a := variable(Arm)).side, a.gripper)"},
+     "code": "set_of(arm.side, arm.gripper)"},
+    {"text": "which objects are on the bench?",
+     "code": "an(entity(obj))"},
+    {"text": "the yellow vial",
+     "code": "the(entity(obj).where(obj.kind == 'bottle'))"},
     {"text": "what does it pick up?",
-     "code": "the(entity((e := variable(ActionEpisode)).picks).where(e.name == 'pickup'))"},
+     "code": "the(entity(ep.picks).where(ep.name == 'pickup'))"},
     {"text": "where does it place it?",
-     "code": "the(entity((e := variable(ActionEpisode)).places_at).where(e.name == 'place'))"},
+     "code": "the(entity(ep.places_at).where(ep.name == 'place'))"},
     {"text": "which arm does the pickup?",
-     "code": "the(entity((e := variable(ActionEpisode)).performed_by).where(e.name == 'pickup'))"},
+     "code": "the(entity(ep.performed_by).where(ep.name == 'pickup'))"},
     # --- the CRAM architecture behind the demo ---
     {"text": "CRAM packages by size",
-     "code": "set_of((p := variable(Package)).name, p.class_count).ordered_by(p.class_count, descending=True)"},
+     "code": "set_of(pkg.name, pkg.class_count).ordered_by(pkg.class_count, descending=True)"},
     {"text": "all Designator classes",
-     "code": "an(entity(c := variable(PythonClass)).where(c.name.endswith('Designator')))"},
+     "code": "an(entity(cls).where(cls.name.endswith('Designator')))"},
     {"text": "where does EQL live?",
-     "code": "set_of((c := variable(PythonClass)).name, c.module).where(in_('entity_query_language', c.module)).limit(15)"},
+     "code": "set_of(cls.name, cls.module).where(in_('entity_query_language', cls.module)).limit(15)"},
     {"text": "subclasses of Symbol",
-     "code": "an(entity(c := variable(PythonClass)).where(in_('Symbol', c.bases)))"},
+     "code": "an(entity(cls).where(in_('Symbol', cls.bases)))"},
     {"text": "inside coraplex",
-     "code": "an(SubPackage)(package='coraplex')"},
+     "code": "an(entity(sub).where(sub.package == 'coraplex'))"},
 ]
 
 
