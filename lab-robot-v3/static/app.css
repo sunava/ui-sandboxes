@@ -33,6 +33,12 @@ body{
   background:linear-gradient(135deg,var(--accent),var(--accent2));
   box-shadow:0 6px 20px rgba(57,213,200,.35);
 }
+/* AICOR logo — navy artwork, so it needs a light chip to read on the dark bar
+   (the tagline is darker than the topbar; transparent-on-dark is invisible) */
+.logo-img{
+  height:34px;width:auto;display:block;border-radius:6px;
+  padding:6px 12px;background:#fff;box-shadow:0 4px 16px rgba(0,0,0,.35);
+}
 .brand-text h1{margin:0;font-size:18px;font-weight:700;letter-spacing:.2px}
 .brand-text p{margin:2px 0 0;font-size:12.5px;color:var(--muted)}
 .topbar-actions .ext{
