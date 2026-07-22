@@ -106,10 +106,12 @@
       '<b>rules</b> and <b>description-logic axioms / predicates</b>, and made explorable as a ' +
       '<b>graph</b> — queried with <b>EQL</b>, krrood’s pythonic entity query language from the ' +
       'CRAM architecture.</p>' +
-      '<p class="hint-txt">Ready-made variables: <code>obj</code> (bench objects), <code>ep</code> ' +
-      '(action episodes), <code>arm</code>, <code>j</code> (joint motion), <code>rob</code>, ' +
-      '<code>pkg</code> / <code>sub</code> / <code>cls</code> (CRAM packages, subpackages, classes). ' +
-      'Build queries like <code>an(entity(obj).where(obj.kind == \'bottle\'))</code> — ' +
+      '<p class="hint-txt">Every entity is a <code>Symbol</code>, so you query the class by name — ' +
+      'no throwaway variables. Classes: <code>Robot</code>, <code>Arm</code>, <code>Gripper</code>, ' +
+      '<code>BenchObject</code>, <code>ActionEpisode</code>, <code>JointMotion</code>, ' +
+      '<code>Package</code>, <code>SubPackage</code>, <code>PythonClass</code>. ' +
+      'Try <code>an(Robot)</code>, <code>the(BenchObject)(kind=\'bottle\')</code>, or ' +
+      '<code>an(entity(c := variable(PythonClass)).where(c.name.endswith(\'Designator\')))</code> — ' +
       'or click a preset below, or a node in the graph.</p>';
   }
 
